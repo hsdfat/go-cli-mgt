@@ -8,7 +8,7 @@ info:
 servers:
   - url: '{apiRoot}/mgt-svc/v1'
 paths:
-  /user/authen:
+  /auth/login:
     post:
       tags:
         - Authentication
@@ -26,8 +26,50 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/TokenRequestResponse'
+        '400':
+          description: Missing param or field
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'        
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/change-password:
+    post:
+      tags:
+        - Authentication
+      operationId: change-password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassWord'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TokenRequestResponse'
+        '400':
+          description: Missing param or field
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'  
         '401':
-          description: Unauthorized
+          description: Unauthentication or not authorize to change username's password
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'                 
+        '500':
+          description: Internal Server Error
           content:
             '*/*':
               schema:
@@ -35,7 +77,7 @@ paths:
   /user:
     post:
       tags:
-        - Authentication
+        - User
       operationId: Create or Modify User Profile
       requestBody:
         content:
@@ -49,25 +91,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/User'
+                type: string
         '400':
-          description: Wrong/Missing query/body field
+          description: Missing param or field
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorResponse'  
         '401':
-          description: Unauthorize
+          description: Unauthentication
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Not found user or network element
-          content:
-            "*/*":
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorResponse'                 
         '500':
           description: Internal Server Error
           content:
@@ -76,7 +112,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
     delete:
       tags:
-        - Authentication
+        - User
       parameters:
         - name: user
           in: query
@@ -85,25 +121,43 @@ paths:
             type: string
       responses:
         '204':
-          description: Delete success
+          description: Delete
         '400':
-          description: Wrong/Missing query/body field
+          description: Missing param or field
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ErrorResponse'  
         '401':
-          description: Unauthorize
+          description: Unauthentication
           content:
-            "*/*":
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'                 
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Not found user or network element
+  /user/change-password:
+    post:
+      tags:
+        - User
+      operationId: self change password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUser'
+        required: true
+      responses:
+        '200':
+          description: OK
           content:
-            "*/*":
+            '*/*':
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/TokenRequestResponse'
         '500':
           description: Internal Server Error
           content:
@@ -1037,3 +1091,12 @@ components:
           type: array
           items:
             type: integer
+    ChangePassWord:
+      type: object
+      properties:
+        username:
+          type: string
+        old-password:
+          type: string 
+        new-password:
+          type: string           
