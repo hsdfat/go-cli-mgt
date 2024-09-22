@@ -32,7 +32,9 @@ CREATE TABLE "network_element" (
 CREATE TABLE "user_ne" (
   "id" integer PRIMARY KEY,
   "user_id" integer,
-  "ne_id" integer
+  "ne_id" integer,
+
+  UNIQUE(user_id, ne_id)
 );
 
 CREATE TABLE "role" (
@@ -45,7 +47,9 @@ CREATE TABLE "role" (
 CREATE TABLE "user_role" (
   "id" integer PRIMARY KEY,
   "user_id" integer,
-  "role_id" integer
+  "role_id" integer,
+  
+  UNIQUE(user_id, role_id)
 );
 
 CREATE TABLE "login_history" (
