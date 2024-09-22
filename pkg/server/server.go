@@ -1,6 +1,8 @@
 package server
 
 import (
+	"go-cli-mgt/pkg/config"
+	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/middleware"
 	"go-cli-mgt/pkg/service/auth"
 	"go-cli-mgt/pkg/service/history"
@@ -45,8 +47,11 @@ func NewFiber() *fiber.App {
 	}
 	userListRouter := router.Group("/users")
 	{
+		userListRouter.Use(middleware.BasicAuth)
+
 		userListRouter.Get("/permission", user.ListUsersPermissionHandler)
 		userListRouter.Get("/network-element", user.ListUsersNetworkElementHandler)
+		userListRouter.Get("/profile", user.ListUsersProfileHandler)
 	}
 	permissionRouter := router.Group("/permission")
 	{
@@ -65,8 +70,17 @@ func NewFiber() *fiber.App {
 	historyRouter := router.Group("/history")
 	{
 		historyRouter.Use(middleware.BasicAuth)
-        router.Post("/hitory", history.SaveHistoryHandler)
-        router.Get("/hitory", history.GetHistoryHandler)
-    }
+		router.Post("/hitory", history.SaveHistoryHandler)
+		router.Get("/hitory", history.GetHistoryHandler)
+	}
 	return app
+}
+
+func ListenAndServe(app *fiber.App) {
+	cfg := config.GetServerConfig()
+
+	err := app.Listen(cfg.Host + ":" + cfg.Port)
+	if err != nil {
+		logger.Logger.Fatalf("Can't listen server: %v", err)
+	}
 }

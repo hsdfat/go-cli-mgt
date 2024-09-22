@@ -29,6 +29,7 @@ type LogConfig struct {
 type DatabaseConfig struct {
 	DbType string
 	Mysql  MySqlConfig
+	Pgsql  PostgresConfig
 }
 
 type TokenConfig struct{}

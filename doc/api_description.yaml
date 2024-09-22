@@ -505,7 +505,7 @@ paths:
           description: User Name to get authorize
           schema:
             type: string
-        - name: ne_id
+        - name: ne-id
           in: query
           description: Ne Id want to delete
           schema:
@@ -623,6 +623,45 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /users/profile:
+    get:
+      tags:
+        - List User
+        - User
+      operationId: Get User Profile List
+      responses:
+        '200':
+          description: List ne
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Wrong/Missing query
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorize
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found user
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'              
   /users/network-element:
     get:
       tags:
@@ -710,7 +749,7 @@ paths:
         - Network element
       operationId: Delete Network element
       parameters:
-        - name: ne_id
+        - name: ne-id
           in: query
           description: Ne Id want to delete
           schema:
@@ -788,7 +827,7 @@ paths:
           required: true
           schema:
             type: string
-        - name: ne_name
+        - name: ne-name
           in: query
           required: true
           schema:
@@ -811,7 +850,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LoginHistoryResponse'
+                  $ref: '#/components/schemas/HistoryResponse'
         '400':
           description: Wrong/Missing Query
           content:
@@ -854,7 +893,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/LoginHistory'
+                  $ref: '#/components/schemas/History'
         '500':
           description: Internal Server Error
           content:
@@ -874,10 +913,10 @@ components:
     Permission:
       type: object
       properties:
-        roleId:
+        role-id:
           type: integer
           format: int64
-        permission:
+        role-name:
           type: string
         priority:
           type: integer
@@ -896,7 +935,7 @@ components:
       properties:
         status:
           type: number
-        access_token:
+        access-token:
           type: string
     User:
       type: object
@@ -908,38 +947,50 @@ components:
           type: string
         password:
           type: string
-        is_active:
+        active:
           type: boolean
-        phone_number:
+        full-name:
           type: string
-        fail_attempt:
+        phone-number:
+          type: string
+        fail-attempt:
           type: integer
           format: int32
         email:
           type: string
-        created_by:
+        created-by:
           type: string
-        created_date:
+        disable-date:
+          type: string
+          format: date-time  
+        created-date:
           type: string
           format: date-time
     NeData:
       type: object
       properties:
-        ne_id:
+        ne-id:
           type: number
-        site:
+        name:
+          type: string  
+        type:
           type: string
-        ne:
+        master-ip-config:
           type: string
-        ip:
+        master-port-config:
+          type: integer
+        slave-ip-config:
           type: string
+        slave-port-config:
+          type: integer
+        ip-command:
+          type: string
+        port-command:
+          type: integer    
         description:
           type: string
         namespace:
           type: string
-        port:
-          type: integer
-          format: int32
     NeResponse:
       type: object
       properties:
@@ -947,21 +998,21 @@ components:
           type: string
         message:
           type: string
-        ne_list:
+        ne-list:
           type: array
           items:
             $ref: '#/components/schemas/NeData'
     NeCommandData:
       type: object
       properties:
-        ne_id:
+        ne-id:
           type: number
         ip:
           type: string
         port:
           type: integer
           format: int32
-        base_url:
+        base-url:
           type: string
     NeCommandResponse:
       type: object
@@ -970,24 +1021,27 @@ components:
           type: string
         message:
           type: string
-        ne_command_list:
+        ne-command-list:
           type: array
           items:
             $ref: '#/components/schemas/NeCommandData'
-    LoginHistory:
+    History:
       type: object
       properties:
         username:
           type: string
-        ip:
+        user-ip:
           type: string
-        msg:
+        command:
           type: string
-        ne_name:
+        ne-name:
           type: string
         result:
+          type: boolean
+        executed-time:
           type: string
-    LoginHistoryResponse:
+          format: date_time  
+    HistoryResponse:
       type: object
       properties:
         limit:
@@ -996,10 +1050,10 @@ components:
           type: number
         to:
           type: number
-        history_list:
+        history-list:
           type: array
           items:
-            $ref: '#/components/schemas/LoginHistory'
+            $ref: '#/components/schemas/History'
     UserPermission:
       type: object
       properties:
@@ -1012,7 +1066,7 @@ components:
       properties:
         username:
           type: string
-        ne_id:
+        ne-id:
           type: integer
           format: int
     UserAllowedNeList:
@@ -1020,7 +1074,7 @@ components:
       properties:
         username:
           type: string
-        ne_id:
+        ne-id:
           type: array
           items:
             type: integer
