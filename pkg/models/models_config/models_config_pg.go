@@ -6,4 +6,5 @@ type PostgresConfig struct {
 	User     string
 	Password string
 	DbName   string
+	Schema   string
 }

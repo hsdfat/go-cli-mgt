@@ -51,6 +51,7 @@ func Initialize() *fiber.App {
 				User:     os.Getenv("PG_USER"),
 				Password: os.Getenv("PG_PASSWORD"),
 				DbName:   os.Getenv("PG_DB_NAME"),
+				Schema:   os.Getenv("PG_DB_SCHEMA"),
 			},
 		},
 		Log: models_config.LogConfig{

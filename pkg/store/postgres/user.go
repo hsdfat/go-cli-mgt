@@ -10,7 +10,7 @@ import (
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
-	query := `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`
+	query := `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id`
 	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password)
 
 	var id uint
@@ -23,7 +23,7 @@ func (c *PgClient) CreateUser(user *models_api.User) error {
 }
 
 func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
-	query := `SELECT id, username, email, password FROM users WHERE id = $1`
+	query := `SELECT id, username, email, password FROM "user" WHERE id = $1`
 	row := c.pool.QueryRow(context.Background(), query, id)
 
 	var user models_api.User
@@ -38,7 +38,7 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 }
 
 func (c *PgClient) ListUsers() ([]models_api.User, error) {
-	query := `SELECT id, username, email FROM public.user`
+	query := `SELECT id, username, email FROM "user"`
 	rows, err := c.pool.Query(context.Background(), query)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,7 @@ import (
 
 type PgClient struct {
 	pool *pgxpool.Pool
+	cfg  models_config.PostgresConfig
 }
 
 var (
@@ -39,5 +40,6 @@ func (c *PgClient) Init(cfg models_config.DatabaseConfig) error {
 		os.Exit(1)
 	}
 	c.pool = dbPool
+	c.cfg = cfg.Pgsql
 	return nil
 }
