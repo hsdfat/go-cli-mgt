@@ -11,13 +11,33 @@ type DatabaseStore interface {
 	Init(cfg models_config.DatabaseConfig) error
 
 	// UserRepository
-	CreateUserRepository
+	UserRepository
+	LoginRepository
+	HistoryRepository
+	RoleRepository
+	NetworkElementRepository
+	MmeCommandRepository
 }
 
-type CreateUserRepository interface {
+type UserRepository interface {
 	CreateUser(user *models_api.User) error
 	GetUserByID(id uint) (*models_api.User, error)
 	ListUsers() ([]models_api.User, error)
+}
+
+type RoleRepository interface {
+}
+
+type NetworkElementRepository interface {
+}
+
+type MmeCommandRepository interface {
+}
+
+type LoginRepository interface {
+}
+
+type HistoryRepository interface {
 }
 
 var (
