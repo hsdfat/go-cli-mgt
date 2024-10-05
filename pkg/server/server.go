@@ -1,16 +1,15 @@
 package server
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"go-cli-mgt/pkg/config"
+	"go-cli-mgt/pkg/handler/auth"
+	"go-cli-mgt/pkg/handler/history"
+	"go-cli-mgt/pkg/handler/network_element"
+	"go-cli-mgt/pkg/handler/permission"
+	"go-cli-mgt/pkg/handler/user"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/middleware"
-	"go-cli-mgt/pkg/service/auth"
-	"go-cli-mgt/pkg/service/history"
-	"go-cli-mgt/pkg/service/network_element"
-	"go-cli-mgt/pkg/service/permission"
-	"go-cli-mgt/pkg/service/user"
-
-	"github.com/gofiber/fiber/v2"
 )
 
 // New echo router

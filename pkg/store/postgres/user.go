@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
@@ -28,7 +29,22 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("user not found")
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) {
+	query := `SELECT * FROM "user" WHERE username = $1`
+	row := c.pool.QueryRow(context.Background(), query, username)
+
+	var user models_api.User
+	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active)
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, fmt.Errorf("user not found")
 	} else if err != nil {
 		return nil, err

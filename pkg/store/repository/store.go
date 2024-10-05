@@ -4,6 +4,7 @@ import (
 	"go-cli-mgt/pkg/config"
 	"go-cli-mgt/pkg/models/models_api"
 	"go-cli-mgt/pkg/models/models_config"
+	"go-cli-mgt/pkg/models/models_db"
 	"go-cli-mgt/pkg/store/postgres"
 )
 
@@ -20,9 +21,11 @@ type DatabaseStore interface {
 }
 
 type UserRepository interface {
-	CreateUser(user *models_api.User) error
-	GetUserByID(id uint) (*models_api.User, error)
+	CreateUser(*models_api.User) error
+	GetUserByID(uint) (*models_api.User, error)
 	ListUsers() ([]models_api.User, error)
+	GetUserByUsername(string) (*models_api.User, error)
+	GetRoleByUserId(uint) ([]models_db.Role, error)
 }
 
 type RoleRepository interface {
