@@ -7,19 +7,17 @@ import (
 	"net/http"
 )
 
-func InternalError(c *fiber.Ctx, message string) {
+func BadRequest(c *fiber.Ctx, message string) {
 	if len(message) == 0 {
-		message = "Internal Server Error"
+		message = "Bad Request"
 	}
 
-	resp := models_response.RespError{
+	err := c.Status(http.StatusBadRequest).JSON(models_response.RespError{
 		Status:  false,
-		Code:    http.StatusInternalServerError,
-		Message: "Internal Server Error",
-		Error:   message,
-	}
-
-	err := c.Status(http.StatusInternalServerError).JSON(resp)
+		Code:    http.StatusBadRequest,
+		Message: message,
+		Error:   "Bad Request",
+	})
 	if err != nil {
 		logger.Logger.Error("Cannot send response with message: ", message)
 		return

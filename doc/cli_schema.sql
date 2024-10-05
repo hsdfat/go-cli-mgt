@@ -71,7 +71,7 @@ CREATE TABLE "operation_history" (
 );
 
 CREATE TABLE "server_info" (
-  "id" interger PRIMARY KEY,
+  "id" integer PRIMARY KEY,
   "ip_ssh" varchar,
   "ip_internal" varchar,
   "name" varchar,

@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
-	query := `INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password)
+	query := `INSERT INTO "user" (username, email, password, active, created_date) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, true, time.Now())
 
 	var id uint
 	err := row.Scan(&id)
@@ -44,7 +45,8 @@ func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) 
 
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active)
-	if errors.Is(err, pgx.ErrNoRows) {
+	//if errors.Is(err, pgx.ErrNoRows) {
+	if err == pgx.ErrNoRows {
 		return nil, fmt.Errorf("user not found")
 	} else if err != nil {
 		return nil, err
