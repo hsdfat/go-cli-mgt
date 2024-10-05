@@ -13,7 +13,7 @@ import (
 )
 
 func Initialize() *fiber.App {
-	err := godotenv.Load("D:/Projects/go/go-cli-mgt/.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
