@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	pgxv4"github.com/jackc/pgx/v4"
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
@@ -45,8 +46,7 @@ func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) 
 
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active)
-	//if errors.Is(err, pgx.ErrNoRows) {
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgxv4.ErrNoRows) {
 		return nil, fmt.Errorf("user not found")
 	} else if err != nil {
 		return nil, err

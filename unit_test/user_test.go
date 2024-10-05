@@ -2,15 +2,18 @@ package unit_test
 
 import (
 	"errors"
-	"github.com/stretchr/testify/require"
 	"go-cli-mgt/pkg/models/models_api"
+	"go-cli-mgt/pkg/server"
 	"go-cli-mgt/pkg/service/user"
 	"go-cli-mgt/pkg/service/utils/bcrypt"
 	"go-cli-mgt/pkg/service/utils/random"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreateProfile(t *testing.T) {
+	server.Initialize()
 	userTest := models_api.User{
 		Username: random.StringRandom(10),
 		Password: random.StringRandom(20),

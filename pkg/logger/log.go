@@ -143,9 +143,10 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	fileName := ""
 	line := 0
 	if entry.HasCaller() {
-		strList := strings.Split(entry.Caller.File, "/")
-		if len(strList) > 0 {
-			fileName = strList[len(strList)-1]
+		strList := strings.Split(entry.Caller.File, "go-cli-mgt")
+		if len(strList) > 1 {
+
+			fileName = "." + strList[1]
 		}
 		line = entry.Caller.Line
 	}
@@ -163,7 +164,7 @@ func (f *myFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	buff.WriteString(entry.Time.Format(f.TimestampFormat))
 	buff.WriteString("]")
 	buff.WriteString(fmt.Sprintf("[\x1b[%dm%-.4s\x1b[0m]", levelColor, strings.ToUpper(entry.Level.String())))
-	buff.WriteString(fmt.Sprintf("[%-30s]", file))
+	buff.WriteString(fmt.Sprintf("[%-50s]", file))
 
 	buff.WriteString(fmt.Sprintf("%-5s", tag))
 
