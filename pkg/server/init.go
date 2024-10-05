@@ -12,8 +12,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Initialize() *fiber.App {
-	err := godotenv.Load()
+func Initialize(filenames ...string) *fiber.App {
+	err := godotenv.Load(filenames...)
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}

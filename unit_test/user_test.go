@@ -13,7 +13,8 @@ import (
 )
 
 func TestCreateProfile(t *testing.T) {
-	server.Initialize()
+	// Setup env, should be absolute path
+	server.Initialize(".env")
 	userTest := models_api.User{
 		Username: random.StringRandom(10),
 		Password: random.StringRandom(20),

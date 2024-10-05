@@ -7,7 +7,8 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	server.Initialize()
+	// Setup env, should be absolute path
+	server.Initialize(".env")
 
 	os.Exit(m.Run())
 }
