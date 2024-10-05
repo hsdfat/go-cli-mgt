@@ -8,20 +8,16 @@
  */
 package models_api
 
-import (
-	"time"
-)
-
 type User struct {
-	Id          uint      `json:"id,omitempty"`
-	Username    string    `json:"username,omitempty"`
-	Password    string    `json:"password,omitempty"`
-	Active      bool      `json:"active,omitempty"`
-	FullName    string    `json:"full-name,omitempty"`
-	PhoneNumber string    `json:"phone-number,omitempty"`
-	FailAttempt int32     `json:"fail-attempt,omitempty"`
-	Email       string    `json:"email,omitempty"`
-	CreatedBy   string    `json:"created-by,omitempty"`
-	DisableDate time.Time `json:"disable-date,omitempty"`
-	CreatedDate time.Time `json:"created-date,omitempty"`
+	Id          uint   `json:"id,omitempty"`
+	Username    string `json:"username,omitempty"`
+	Password    string `json:"password,omitempty"`
+	Active      bool   `json:"active,omitempty"`
+	FullName    string `json:"full-name,omitempty"`
+	PhoneNumber string `json:"phone-number,omitempty"`
+	FailAttempt int32  `json:"fail-attempt,omitempty"`
+	Email       string `json:"email,omitempty"`
+	CreatedBy   string `json:"created-by,omitempty"`
+	DisableDate uint64 `json:"disable-date,omitempty"`
+	CreatedDate uint64 `json:"created-date,omitempty"`
 }

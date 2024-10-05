@@ -8,7 +8,7 @@ import (
 
 func TestMain(m *testing.M) {
 	// Setup env, should be absolute path
-	server.Initialize(".env")
+	server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
 
 	os.Exit(m.Run())
 }

@@ -26,6 +26,8 @@ type UserRepository interface {
 	ListUsers() ([]models_api.User, error)
 	GetUserByUsername(string) (*models_api.User, error)
 	GetRoleByUserId(uint) ([]models_db.Role, error)
+	DeleteUser(string) error
+	UpdateUser(*models_api.User) error
 }
 
 type RoleRepository interface {

@@ -1,12 +1,12 @@
 CREATE TABLE "user" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "username" varchar,
-  "password" varchar,
+  "password" varchar(255),
   "full_name" varchar,
   "email" varchar,
   "phone_number" varchar,
-  "created_date" timestamp,
-  "disable_date" timestamp,
+  "created_date_unix" integer,
+  "disable_date_unix" integer,
   "active" bool,
 
     UNIQUE(id),
@@ -16,7 +16,7 @@ CREATE TABLE "user" (
 );
 
 CREATE TABLE "network_element" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "name" varchar,
   "type" varchar,
   "namespace" varchar,
@@ -30,7 +30,7 @@ CREATE TABLE "network_element" (
 );
 
 CREATE TABLE "user_ne" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "user_id" integer,
   "ne_id" integer,
 
@@ -38,14 +38,14 @@ CREATE TABLE "user_ne" (
 );
 
 CREATE TABLE "role" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "role_name" varchar,
   "description" varchar,
   "priority" varchar
 );
 
 CREATE TABLE "user_role" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "user_id" integer,
   "role_id" integer,
   
@@ -53,7 +53,7 @@ CREATE TABLE "user_role" (
 );
 
 CREATE TABLE "login_history" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "user_id" integer,
   "time_login" timestamp,
   "result" bool,
@@ -61,7 +61,7 @@ CREATE TABLE "login_history" (
 );
 
 CREATE TABLE "operation_history" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "username" varchar,
   "command" varchar,
   "executed_time" timestamp,
@@ -71,7 +71,7 @@ CREATE TABLE "operation_history" (
 );
 
 CREATE TABLE "server_info" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "ip_ssh" varchar,
   "ip_internal" varchar,
   "name" varchar,
@@ -82,7 +82,7 @@ CREATE TABLE "server_info" (
 );
 
 CREATE TABLE "mme_subscribers" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "file_index" integer,
   "imsi" varchar,
   "msisdn" varchar,
@@ -97,7 +97,7 @@ CREATE TABLE "mme_subscribers" (
 );
 
 CREATE TABLE "mme_files" (
-  "id" integer PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "file_name" varchar,
   "executed_time" varchar
 );

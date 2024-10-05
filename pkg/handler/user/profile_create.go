@@ -26,8 +26,8 @@ func ProfileCreateHandler(c *fiber.Ctx) error {
 			response.BadRequest(c, "username already existed")
 			return err
 		}
-		logger.Logger.Error("Error parsing JSON request body: ", err)
-		response.InternalError(c, "Error parsing JSON request body")
+		logger.Logger.Error("Error create user: ", err)
+		response.InternalError(c, "Error create user")
 		return err
 	}
 

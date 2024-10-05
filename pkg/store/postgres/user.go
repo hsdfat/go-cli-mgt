@@ -3,18 +3,21 @@ package postgres
 import (
 	"context"
 	"errors"
-	"fmt"
+	pgxv4 "github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
-	"time"
+)
 
-	"github.com/jackc/pgx/v5"
-	pgxv4"github.com/jackc/pgx/v4"
+var (
+	ErrNotFoundUser = errors.New("user not found")
+	ErrDisableUser  = errors.New("user have been disable")
+	ErrEnableUser   = errors.New("user have been active")
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
-	query := `INSERT INTO "user" (username, email, password, active, created_date) VALUES ($1, $2, $3, $4, $5) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, true, time.Now())
+	query := `INSERT INTO "user" (username, email, password, active, created_date_unix) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, user.Active, user.CreatedDate)
 
 	var id uint
 	err := row.Scan(&id)
@@ -25,6 +28,18 @@ func (c *PgClient) CreateUser(user *models_api.User) error {
 	return nil
 }
 
+func (c *PgClient) DeleteUser(username string) error {
+	query := `DELETE FROM "user" WHERE username = $1;`
+	_ = c.pool.QueryRow(context.Background(), query, username)
+	return nil
+}
+
+func (c *PgClient) UpdateUser(user *models_api.User) error {
+	query := `UPDATE "user" SET password = $1, active = $2 where id = $3`
+	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.Id)
+	return nil
+}
+
 func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 	query := `SELECT id, username, email, password FROM "user" WHERE id = $1`
 	row := c.pool.QueryRow(context.Background(), query, id)
@@ -32,7 +47,7 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, fmt.Errorf("user not found")
+		return nil, ErrNotFoundUser
 	} else if err != nil {
 		return nil, err
 	}
@@ -41,13 +56,13 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 }
 
 func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) {
-	query := `SELECT * FROM "user" WHERE username = $1`
+	query := `SELECT "id", "username", "password", "active", "email", "created_date_unix"FROM "user" WHERE username = $1`
 	row := c.pool.QueryRow(context.Background(), query, username)
 
 	var user models_api.User
-	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active)
+	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate)
 	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, fmt.Errorf("user not found")
+		return nil, ErrNotFoundUser
 	} else if err != nil {
 		return nil, err
 	}
