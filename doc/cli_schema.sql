@@ -117,7 +117,7 @@ ALTER TABLE "login_history" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id")
 
 ALTER TABLE "mme_subscribers" ADD FOREIGN KEY ("file_index") REFERENCES "mme_files" ("id");
 
-ALTER TABLE "operation_history" ADD FOREIGN KEY ("username") REFERENCES "user" ("username");
+-- ALTER TABLE "operation_history" ADD FOREIGN KEY ("username") REFERENCES "user" ("username");
 
 INSERT INTO "role" (role_name, description, priority)
 VALUES

@@ -9,12 +9,8 @@
 package models_api
 
 type HistoryResponse struct {
-
-	Limit float64 `json:"limit,omitempty"`
-
-	From float64 `json:"from,omitempty"`
-
-	To float64 `json:"to,omitempty"`
-
+	Limit       float64   `json:"limit,omitempty"`
+	From        float64   `json:"from,omitempty"`
+	To          float64   `json:"to,omitempty"`
 	HistoryList []History `json:"history-list,omitempty"`
 }

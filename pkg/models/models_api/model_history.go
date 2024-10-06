@@ -8,17 +8,15 @@
  */
 package models_api
 
+import "time"
+
 type History struct {
-
-	Username string `json:"username,omitempty"`
-
-	UserIp string `json:"user-ip,omitempty"`
-
-	Command string `json:"command,omitempty"`
-
-	NeName string `json:"ne-name,omitempty"`
-
-	Result bool `json:"result,omitempty"`
-
-	ExecutedTime string `json:"executed-time,omitempty"`
+	Id           uint64    `json:"id"`
+	Username     string    `json:"username,omitempty"`
+	UserIp       string    `json:"user-ip,omitempty"`
+	Command      string    `json:"command,omitempty"`
+	NeName       string    `json:"ne-name,omitempty"`
+	Result       bool      `json:"result,omitempty"`
+	ExecutedTime time.Time `json:"executed-time,omitempty"`
+	Mode         string    `json:"mode"`
 }

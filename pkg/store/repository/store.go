@@ -21,6 +21,11 @@ type DatabaseStore interface {
 }
 
 type UserRepository interface {
+	SaveHistory(*models_api.History) error
+	GetHistoryById(uint64) (*models_api.History, error)
+	DeleteHistoryById(uint64) error
+	GetHistoryListByMode(string) ([]models_api.History, error)
+
 	CreateUser(*models_api.User) error
 	GetUserByID(uint) (*models_api.User, error)
 	ListUsers() ([]models_api.User, error)
