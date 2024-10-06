@@ -4,8 +4,8 @@ import (
 	"errors"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
+	"go-cli-mgt/pkg/models/models_error"
 	"go-cli-mgt/pkg/service/utils/bcrypt"
-	"go-cli-mgt/pkg/store/postgres"
 	"go-cli-mgt/pkg/store/repository"
 	"time"
 )
@@ -13,7 +13,7 @@ import (
 func CreateProfile(user models_api.User) error {
 	userDb, err := repository.GetSingleton().GetUserByUsername(user.Username)
 	if err != nil {
-		if !errors.Is(err, postgres.ErrNotFoundUser) {
+		if !errors.Is(err, models_error.ErrNotFoundUser) {
 			logger.Logger.Error("Cannot get user by username from db, username: ", user.Username, " err: ", err)
 			return err
 		}

@@ -7,3 +7,9 @@ var (
 	InvalidAuthHeader = errors.New("authorize header of request invalid")
 	InvalidToken      = errors.New("invalid token")
 )
+
+var (
+	ErrNotFoundUser = errors.New("user not found")
+	ErrDisableUser  = errors.New("user have been disable")
+	ErrEnableUser   = errors.New("user have been active")
+)

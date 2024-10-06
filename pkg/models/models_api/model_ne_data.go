@@ -9,26 +9,16 @@
 package models_api
 
 type NeData struct {
-
-	NeId float64 `json:"ne-id,omitempty"`
-
-	Name string `json:"name,omitempty"`
-
-	Type_ string `json:"type,omitempty"`
-
-	MasterIpConfig string `json:"master-ip-config,omitempty"`
-
-	MasterPortConfig int32 `json:"master-port-config,omitempty"`
-
-	SlaveIpConfig string `json:"slave-ip-config,omitempty"`
-
-	SlavePortConfig int32 `json:"slave-port-config,omitempty"`
-
-	IpCommand string `json:"ip-command,omitempty"`
-
-	PortCommand int32 `json:"port-command,omitempty"`
-
-	Description string `json:"description,omitempty"`
-
-	Namespace string `json:"namespace,omitempty"`
+	NeId             uint   `json:"ne-id,omitempty"`
+	Name             string `json:"name,omitempty"`
+	Url              string `json:"url"`
+	Type             string `json:"type,omitempty"`
+	MasterIpConfig   string `json:"master-ip-config,omitempty"`
+	MasterPortConfig int32  `json:"master-port-config,omitempty"`
+	SlaveIpConfig    string `json:"slave-ip-config,omitempty"`
+	SlavePortConfig  int32  `json:"slave-port-config,omitempty"`
+	IpCommand        string `json:"ip-command,omitempty"`
+	PortCommand      int32  `json:"port-command,omitempty"`
+	Description      string `json:"description,omitempty"`
+	Namespace        string `json:"namespace,omitempty"`
 }

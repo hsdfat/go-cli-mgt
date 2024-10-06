@@ -3,10 +3,10 @@ package unit_test
 import (
 	"errors"
 	"go-cli-mgt/pkg/models/models_api"
+	"go-cli-mgt/pkg/models/models_error"
 	"go-cli-mgt/pkg/service/user"
 	"go-cli-mgt/pkg/service/utils/bcrypt"
 	"go-cli-mgt/pkg/service/utils/random"
-	"go-cli-mgt/pkg/store/postgres"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -41,7 +41,7 @@ func TestCreateAndDeleteProfile(t *testing.T) {
 
 	// Try to get user again, must be return an error
 	userGetTest, err = user.GetProfileByUsername(userTest.Username)
-	if errors.Is(err, postgres.ErrNotFoundUser) == false {
+	if errors.Is(err, models_error.ErrNotFoundUser) == false {
 		require.Error(t, errors.New("delete user un success"))
 	}
 }
@@ -72,7 +72,7 @@ func TestDisableAndEnableUser(t *testing.T) {
 		Email:    "userTest1",
 	}
 
-	err := user.DisableProfile(userTest.Username)
+	err := user.DisableProfile(userTest.Username, "phatlc")
 	require.NoError(t, err)
 	userGetTest, err := user.GetProfileByUsername(userTest.Username)
 	require.NoError(t, err)

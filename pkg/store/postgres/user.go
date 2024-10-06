@@ -7,12 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
-)
-
-var (
-	ErrNotFoundUser = errors.New("user not found")
-	ErrDisableUser  = errors.New("user have been disable")
-	ErrEnableUser   = errors.New("user have been active")
+	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
@@ -29,14 +24,14 @@ func (c *PgClient) CreateUser(user *models_api.User) error {
 }
 
 func (c *PgClient) DeleteUser(username string) error {
-	query := `DELETE FROM "user" WHERE username = $1;`
+	query := `DELETE FROM "user" WHERE username = $1`
 	_ = c.pool.QueryRow(context.Background(), query, username)
 	return nil
 }
 
 func (c *PgClient) UpdateUser(user *models_api.User) error {
-	query := `UPDATE "user" SET password = $1, active = $2, disable_date_unix = $3 where id = $4`
-	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.DisableDate, user.Id)
+	query := `UPDATE "user" SET password = $1, active = $2, disable_date_unix = $3, deactivate_by = $4 where id = $5`
+	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.DisableDate, user.DeActivateBy, user.Id)
 	return nil
 }
 
@@ -47,7 +42,7 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, ErrNotFoundUser
+		return nil, models_error.ErrNotFoundUser
 	} else if err != nil {
 		return nil, err
 	}
@@ -62,7 +57,7 @@ func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) 
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate, &user.DisableDate)
 	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, ErrNotFoundUser
+		return nil, models_error.ErrNotFoundUser
 	} else if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/store/postgres"
+	"go-cli-mgt/pkg/models/models_error"
 	"go-cli-mgt/pkg/store/repository"
 	"time"
 )
@@ -11,7 +11,7 @@ import (
 func DeleteProfile(username string) error {
 	_, err := repository.GetSingleton().GetUserByUsername(username)
 	if err != nil {
-		if !errors.Is(err, postgres.ErrNotFoundUser) {
+		if !errors.Is(err, models_error.ErrNotFoundUser) {
 			logger.Logger.Error("Cannot get user by username from database: ", err)
 			return err
 		}
@@ -25,7 +25,7 @@ func DeleteProfile(username string) error {
 	return nil
 }
 
-func DisableProfile(username string) error {
+func DisableProfile(username string, userDeactivate string) error {
 	user, err := repository.GetSingleton().GetUserByUsername(username)
 	if err != nil {
 		logger.Logger.Error("Cannot get user by username from database: ", err)
@@ -33,12 +33,13 @@ func DisableProfile(username string) error {
 	}
 
 	if user.Active == false {
-		logger.Logger.Error(postgres.ErrDisableUser)
-		return postgres.ErrDisableUser
+		logger.Logger.Error(models_error.ErrDisableUser)
+		return models_error.ErrDisableUser
 	}
 
 	user.Active = false
 	user.DisableDate = uint64(time.Now().Unix())
+	user.DeActivateBy = userDeactivate
 	err = repository.GetSingleton().UpdateUser(user)
 	if err != nil {
 		logger.Logger.Error("Cannot update user to database: ", err)

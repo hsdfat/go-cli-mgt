@@ -7,6 +7,7 @@ import (
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
+const numberStr = "0123456789"
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -21,6 +22,16 @@ func StringRandom(n int) string {
 	k := len(alphabet)
 	for i := 0; i < n; i++ {
 		c := alphabet[rand.Intn(k)]
+		sb.WriteByte(c)
+	}
+	return sb.String()
+}
+
+func NumberStringRandom(n int) string {
+	var sb strings.Builder
+	k := len(numberStr)
+	for i := 0; i < n; i++ {
+		c := numberStr[rand.Intn(k)]
 		sb.WriteByte(c)
 	}
 	return sb.String()

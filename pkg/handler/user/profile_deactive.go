@@ -5,9 +5,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/models/models_api"
+	"go-cli-mgt/pkg/models/models_error"
 	userService "go-cli-mgt/pkg/service/user"
 	"go-cli-mgt/pkg/service/utils/response"
-	"go-cli-mgt/pkg/store/postgres"
 )
 
 func ProfileDeactivateHandler(c *fiber.Ctx) error {
@@ -19,10 +19,11 @@ func ProfileDeactivateHandler(c *fiber.Ctx) error {
 		return err
 	}
 
+	username := c.Get("username")
 	logger.Logger.Info("Handler disable user with username: ", user.Username)
-	err = userService.DisableProfile(user.Username)
+	err = userService.DisableProfile(user.Username, username)
 	if err != nil {
-		if errors.Is(err, postgres.ErrDisableUser) {
+		if errors.Is(err, models_error.ErrDisableUser) {
 			logger.Logger.Info("username already disable")
 			response.BadRequest(c, "username already disable")
 			return err

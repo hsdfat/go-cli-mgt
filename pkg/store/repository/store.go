@@ -25,9 +25,16 @@ type UserRepository interface {
 	GetUserByID(uint) (*models_api.User, error)
 	ListUsers() ([]models_api.User, error)
 	GetUserByUsername(string) (*models_api.User, error)
-	GetRoleByUserId(uint) ([]models_db.Role, error)
 	DeleteUser(string) error
 	UpdateUser(*models_api.User) error
+
+	GetRoleByUserId(uint) ([]models_db.Role, error)
+
+	CreateNetworkElement(*models_api.NeData) error
+	DeleteNetworkElementByName(string, string) error
+	GetNetworkElementByName(string, string) (*models_api.NeData, error)
+	GetListNetworkElement() ([]models_api.NeData, error)
+	GetNetworkElementByUserName(string) ([]models_api.NeData, error)
 }
 
 type RoleRepository interface {
