@@ -16,7 +16,7 @@ func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
 	var roleList []models_db.Role
 	for rows.Next() {
 		var role models_db.Role
-		err = rows.Scan(&role.Id, &role.RoleName)
+		err = rows.Scan(&role.Id, &role.RoleName, &role.Description, &role.Priority)
 		if err != nil {
 			logger.Logger.Errorln("Error scanning", err)
 			return nil, err

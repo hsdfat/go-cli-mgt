@@ -5,6 +5,7 @@ import (
 	"go-cli-mgt/pkg/logger"
 	"go-cli-mgt/pkg/store/postgres"
 	"go-cli-mgt/pkg/store/repository"
+	"time"
 )
 
 func DeleteProfile(username string) error {
@@ -37,6 +38,7 @@ func DisableProfile(username string) error {
 	}
 
 	user.Active = false
+	user.DisableDate = uint64(time.Now().Unix())
 	err = repository.GetSingleton().UpdateUser(user)
 	if err != nil {
 		logger.Logger.Error("Cannot update user to database: ", err)

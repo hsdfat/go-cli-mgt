@@ -16,8 +16,8 @@ var (
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
-	query := `INSERT INTO "user" (username, email, password, active, created_date_unix) VALUES ($1, $2, $3, $4, $5) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, user.Active, user.CreatedDate)
+	query := `INSERT INTO "user" (username, email, password, active, created_date_unix, disable_date_unix) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, user.Active, user.CreatedDate, user.DisableDate)
 
 	var id uint
 	err := row.Scan(&id)
@@ -35,8 +35,8 @@ func (c *PgClient) DeleteUser(username string) error {
 }
 
 func (c *PgClient) UpdateUser(user *models_api.User) error {
-	query := `UPDATE "user" SET password = $1, active = $2 where id = $3`
-	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.Id)
+	query := `UPDATE "user" SET password = $1, active = $2, disable_date_unix = $3 where id = $4`
+	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.DisableDate, user.Id)
 	return nil
 }
 
@@ -56,11 +56,11 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 }
 
 func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) {
-	query := `SELECT "id", "username", "password", "active", "email", "created_date_unix"FROM "user" WHERE username = $1`
+	query := `SELECT "id", "username", "password", "active", "email", "created_date_unix", "disable_date_unix" FROM "user" WHERE username = $1`
 	row := c.pool.QueryRow(context.Background(), query, username)
 
 	var user models_api.User
-	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate)
+	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate, &user.DisableDate)
 	if errors.Is(err, pgxv4.ErrNoRows) {
 		return nil, ErrNotFoundUser
 	} else if err != nil {

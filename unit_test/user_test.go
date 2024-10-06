@@ -13,16 +13,19 @@ import (
 )
 
 func TestCreateAndDeleteProfile(t *testing.T) {
+	// Create userTest
 	userTest := models_api.User{
 		Username: random.StringRandom(10),
 		Password: random.StringRandom(20),
 		Email:    random.StringRandom(10),
 	}
 
+	// Create User
 	err := user.CreateProfile(userTest)
 	require.NoError(t, err)
 
-	userGetTest, err := user.GetProfile(userTest.Username)
+	// Try to get user
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, userGetTest)
 	require.Equal(t, userTest.Username, userGetTest.Username)
@@ -32,10 +35,12 @@ func TestCreateAndDeleteProfile(t *testing.T) {
 	require.NotZero(t, userGetTest.Id)
 	require.NotZero(t, userGetTest.CreatedDate)
 
+	// Delete User
 	err = user.DeleteProfile(userTest.Username)
 	require.NoError(t, err)
 
-	userGetTest, err = user.GetProfile(userTest.Username)
+	// Try to get user again, must be return an error
+	userGetTest, err = user.GetProfileByUsername(userTest.Username)
 	if errors.Is(err, postgres.ErrNotFoundUser) == false {
 		require.Error(t, errors.New("delete user un success"))
 	}
@@ -48,7 +53,7 @@ func TestGetUser(t *testing.T) {
 		Email:    "userTest1",
 	}
 
-	userGetTest, err := user.GetProfile(userTest.Username)
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
 	require.NoError(t, err)
 	require.NotZero(t, userGetTest.Id)
 	require.NotEmpty(t, userGetTest)
@@ -69,7 +74,7 @@ func TestDisableAndEnableUser(t *testing.T) {
 
 	err := user.DisableProfile(userTest.Username)
 	require.NoError(t, err)
-	userGetTest, err := user.GetProfile(userTest.Username)
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
 	require.NoError(t, err)
 	require.NotZero(t, userGetTest.Id)
 	require.NotEmpty(t, userGetTest)
@@ -84,7 +89,7 @@ func TestDisableAndEnableUser(t *testing.T) {
 	err = user.UpdateProfile(userGetTest)
 	require.NoError(t, err)
 
-	userGetTest2, err := user.GetProfile(userTest.Username)
+	userGetTest2, err := user.GetProfileByUsername(userTest.Username)
 	require.NoError(t, err)
 	require.NotZero(t, userGetTest2.Id)
 	require.NotEmpty(t, userGetTest2)

@@ -19,6 +19,7 @@ func ProfileCreateHandler(c *fiber.Ctx) error {
 	}
 
 	logger.Logger.Info("Handler create user with username: ", user.Username)
+	user.CreatedBy = c.Get("username")
 	err = userService.CreateProfile(user)
 	if err != nil {
 		if errors.Is(err, errors.New("username already existed")) {

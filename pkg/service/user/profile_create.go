@@ -33,6 +33,7 @@ func CreateProfile(user models_api.User) error {
 
 	user.Active = true
 	user.CreatedDate = uint64(time.Now().Unix())
+	user.DisableDate = 1
 	user.Password = bcrypt.Encode(user.Username + user.Password)
 
 	err = repository.GetSingleton().CreateUser(&user)
