@@ -34,7 +34,7 @@ func (c *PgClient) GetNetworkElementByName(neName string, namespace string) (*mo
 	var ne models_api.NeData
 	err := row.Scan(&ne.NeId, &ne.Name, &ne.Type, &ne.Namespace, &ne.MasterIpConfig, &ne.MasterPortConfig, &ne.SlaveIpConfig, &ne.SlavePortConfig, &ne.Url, &ne.IpCommand, &ne.PortCommand)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUser
+		return nil, models_error.ErrNotFoundNe
 	} else if err != nil {
 		return nil, err
 	}

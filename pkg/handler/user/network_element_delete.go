@@ -1,5 +1,9 @@
 package user
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
-func NetworkElementDeleteHandler(c *fiber.Ctx) error { return nil }
+func NetworkElementDeleteHandler(c *fiber.Ctx) error {
+	return nil
+}

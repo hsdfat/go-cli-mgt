@@ -22,7 +22,6 @@ func ProfileCreateHandler(c *fiber.Ctx) error {
 	username := c.Get("username")
 
 	historyCommand := &models_api.History{
-		Id:       0,
 		Username: username,
 		UserIp:   c.IP(),
 		Command:  "Create user " + user.Username + " password xxx",

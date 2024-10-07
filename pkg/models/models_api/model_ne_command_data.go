@@ -9,12 +9,8 @@
 package models_api
 
 type NeCommandData struct {
-
-	NeId float64 `json:"ne-id,omitempty"`
-
-	Ip string `json:"ip,omitempty"`
-
-	Port int32 `json:"port,omitempty"`
-
+	NeId    int64  `json:"ne-id,omitempty"`
+	Ip      string `json:"ip,omitempty"`
+	Port    int32  `json:"port,omitempty"`
 	BaseUrl string `json:"base-url,omitempty"`
 }

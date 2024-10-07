@@ -36,3 +36,15 @@ func NumberStringRandom(n int) string {
 	}
 	return sb.String()
 }
+
+func Ipv4Random() string {
+	var sb strings.Builder
+	sb.WriteString(NumberStringRandom(3))
+	sb.WriteString(".")
+	sb.WriteString(NumberStringRandom(2))
+	sb.WriteString(".")
+	sb.WriteString(NumberStringRandom(2))
+	sb.WriteString(".")
+	sb.WriteString(NumberStringRandom(2))
+	return sb.String()
+}

@@ -13,3 +13,7 @@ var (
 	ErrDisableUser  = errors.New("user have been disable")
 	ErrEnableUser   = errors.New("user have been active")
 )
+
+var (
+	ErrNotFoundNe = errors.New("network element not found")
+)

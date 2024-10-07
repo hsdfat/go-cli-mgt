@@ -52,22 +52,22 @@ func NewFiber() *fiber.App {
 	permissionRouter := router.Group("/permission")
 	{
 		permissionRouter.Use(middleware.BasicAuth)
-		router.Get("/permission", permission.ListPermissionHandler)
-		router.Post("/permission", permission.CreateOrUpdateHandler)
-		router.Delete("/permission", permission.DeleteHandler)
+		permissionRouter.Get("/permission", permission.ListPermissionHandler)
+		permissionRouter.Post("/permission", permission.CreateOrUpdateHandler)
+		permissionRouter.Delete("/permission", permission.DeleteHandler)
 	}
 	networkElementRouter := router.Group("/network-element")
 	{
 		networkElementRouter.Use(middleware.BasicAuth)
-		router.Get("/network-element", network_element.ListNetworkElementHandler)
-		router.Post("/network-element", network_element.CreateOrUpdateHandler)
-		router.Delete("/network-element", network_element.DeleteHandler)
+		networkElementRouter.Get("/", network_element.ListNetworkElementHandler)
+		networkElementRouter.Post("/", network_element.CreateOrUpdateHandler)
+		networkElementRouter.Delete("/", network_element.DeleteHandler)
 	}
 	historyRouter := router.Group("/history")
 	{
 		historyRouter.Use(middleware.BasicAuth)
-		router.Post("/history", history.SaveHistoryHandler)
-		router.Get("/history", history.GetHistoryHandler)
+		historyRouter.Post("/history", history.SaveHistoryHandler)
+		historyRouter.Get("/history", history.GetHistoryHandler)
 	}
 	return app
 }
