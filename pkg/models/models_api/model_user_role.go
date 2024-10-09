@@ -12,5 +12,5 @@ type UserPermission struct {
 
 	Username string `json:"username,omitempty"`
 
-	Permission string `json:"permission,omitempty"`
+	Role string `json:"role,omitempty"`
 }

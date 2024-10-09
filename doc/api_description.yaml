@@ -164,12 +164,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /user/permission:
+  /user/role:
     get:
       tags:
         - User
         - User Authorization
-      operationId: Show user permission with id
+      operationId: Show user role with id
       parameters:
         - name: user
           in: query
@@ -182,7 +182,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/UserPermission'
+                $ref: '#/components/schemas/UserRole'
         '400':
           description: Wrong/Missing query/body field
           content:
@@ -216,7 +216,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPermission'
+              $ref: '#/components/schemas/UserRole'
         required: true
       responses:
         '200':
@@ -224,7 +224,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/UserPermission'
+                $ref: '#/components/schemas/UserRole'
         '400':
           description: Wrong/Missing query/body field
           content:
@@ -292,12 +292,12 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /users/permission:
+  /users/role:
     get:
       tags:
         - List User
         - User Authorization
-      operationId: Get list user permission
+      operationId: Get list user role
       responses:
         '200':
           description: OK
@@ -306,7 +306,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserPermission'
+                  $ref: '#/components/schemas/UserRole'
         '400':
           description: Wrong/Missing query/body field
           content:
@@ -331,16 +331,16 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /permission:
+  /role:
     post:
       tags:
         - Permission
-      operationId: Create or update permission
+      operationId: Create or update role
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Permission'
+              $ref: '#/components/schemas/Role'
         required: true
       responses:
         '200':
@@ -348,7 +348,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Permission'
+                $ref: '#/components/schemas/Role'
         '400':
           description: Wrong/Missing query/body field
           content:
@@ -418,7 +418,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Permission'
+              $ref: '#/components/schemas/Role'
         required: true
       responses:
         '200':
@@ -426,7 +426,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/Permission'
+                $ref: '#/components/schemas/Role'
         '400':
           description: Wrong/Missing query/body field
           content:
@@ -910,7 +910,7 @@ components:
           format: int32
         message:
           type: string
-    Permission:
+    Role:
       type: object
       properties:
         role-id:
@@ -1054,12 +1054,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/History'
-    UserPermission:
+    UserRole:
       type: object
       properties:
         username:
           type: string
-        permission:
+        role:
           type: string
     UserAllowedNe:
       type: object

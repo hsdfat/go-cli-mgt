@@ -8,7 +8,7 @@
  */
 package models_api
 
-type Permission struct {
+type Role struct {
 
 	RoleId int64 `json:"role-id,omitempty"`
 
