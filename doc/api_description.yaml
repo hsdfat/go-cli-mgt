@@ -900,6 +900,109 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /mme-subs/files:
+    get:
+      tags:
+        - MME Subscribers
+      operationId: get history by limit and Network Element name
+      parameters:
+        - name: file-name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string    
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MMEFile'
+        '400':
+          description: Wrong/Missing Query
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorize
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found user
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /mme-subs/subs:
+    get:
+      tags:
+        - MME Subscribers
+      operationId: get history by limit and Network Element name
+      parameters:
+        - name: file-name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: file-index
+          in: query
+          required: false
+          schema:
+            type: string  
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MMESubscribers'
+        '400':
+          description: Wrong/Missing Query
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorize
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found user
+          content:
+            "*/*":
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'                       
 components:
   schemas:
     ErrorResponse:
@@ -1086,4 +1189,36 @@ components:
         old-password:
           type: string 
         new-password:
-          type: string           
+          type: string      
+    MMESubscribers:
+      type: object
+      properties:
+        file_index:
+          type: number
+        imsi:
+          type: string
+        msisdn:
+          type: string
+        imei:
+          type: string
+        mcc:
+          type: string
+        mnc:
+          type: string
+        tac:
+          type: string
+        eci:
+          type: string
+        apn:
+          type: string
+        msc_name:
+          type: string
+        ecm_state:
+          type: string  
+    MMEFile:
+      type: object
+      properties:
+        file_name:
+          type: string
+        executed_time:
+          type: number    
