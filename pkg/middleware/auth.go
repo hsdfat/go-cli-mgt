@@ -19,6 +19,12 @@ const (
 func BasicAuth(c *fiber.Ctx) error {
 	// Basic auth implementation
 
+	authorizeHeaders := c.GetReqHeaders()["Authorization"]
+	if authorizeHeaders == nil {
+		logger.Logger.Error("Request don't have authorize header")
+		response.Unauthorized(c)
+		return models_error.MissingAuthHeader
+	}
 	authHeader := c.GetReqHeaders()["Authorization"][0]
 	if authHeader == "" {
 		logger.Logger.Error("Request don't have authorize header")

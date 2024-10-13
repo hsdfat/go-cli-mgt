@@ -17,3 +17,7 @@ var (
 var (
 	ErrNotFoundNe = errors.New("network element not found")
 )
+
+var (
+	ErrNotFoundUserNe = errors.New("user do not have permission with ne")
+)

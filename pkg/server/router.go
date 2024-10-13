@@ -59,9 +59,9 @@ func NewFiber() *fiber.App {
 	networkElementRouter := router.Group("/network-element")
 	{
 		networkElementRouter.Use(middleware.BasicAuth)
-		networkElementRouter.Get("/", network_element.ListNetworkElementHandler)
-		networkElementRouter.Post("/", network_element.CreateOrUpdateHandler)
-		networkElementRouter.Delete("/", network_element.DeleteHandler)
+		router.Get("/network-element", network_element.ListNetworkElementHandler)
+		router.Post("/network-element", network_element.CreateOrUpdateHandler)
+		router.Delete("/network-element", network_element.DeleteHandler)
 	}
 	historyRouter := router.Group("/history")
 	{

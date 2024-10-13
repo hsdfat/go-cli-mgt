@@ -34,9 +34,9 @@ CREATE TABLE "network_element" (
 CREATE TABLE "user_ne" (
   "id" SERIAL PRIMARY KEY,
   "user_id" integer,
-  "ne_id" integer,
+  "ne_id" integer
 
-  UNIQUE(user_id, ne_id)
+--   UNIQUE(user_id, ne_id)
 );
 
 CREATE TABLE "role" (
@@ -105,9 +105,9 @@ CREATE TABLE "mme_files" (
   "executed_time" varchar
 );
 
-ALTER TABLE "user_ne" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+-- ALTER TABLE "user_ne" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
-ALTER TABLE "user_ne" ADD FOREIGN KEY ("ne_id") REFERENCES "network_element" ("id");
+-- ALTER TABLE "user_ne" ADD FOREIGN KEY ("ne_id") REFERENCES "network_element" ("id");
 
 ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
@@ -121,7 +121,7 @@ ALTER TABLE "mme_subscribers" ADD FOREIGN KEY ("file_index") REFERENCES "mme_fil
 
 INSERT INTO "role" (role_name, description, priority)
 VALUES
-    ('super admin', 'admin role', 'highest'),
+    ('super_admin', 'admin role', 'highest'),
     ('admin', 'admin role', 'highest'),
     ('editor', 'editor role', 'medium'),
     ('viewer', 'viewer role', 'lowest');

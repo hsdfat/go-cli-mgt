@@ -40,6 +40,10 @@ type UserRepository interface {
 	GetNetworkElementByName(string, string) (*models_api.NeData, error)
 	GetListNetworkElement() ([]models_api.NeData, error)
 	GetNetworkElementByUserName(string) ([]models_api.NeData, error)
+
+	UserNeAdd(*models_api.UserNe) error
+	UserNeDelete(uint, uint) error
+	UserNeGet(uint, uint) (*models_api.UserNe, error)
 }
 
 type RoleRepository interface {

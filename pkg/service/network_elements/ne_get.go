@@ -7,11 +7,13 @@ import (
 )
 
 func GetNetworkElement(neName, namespace string) (*models_api.NeData, error) {
+	logger.Logger.Infof("Get network element info with ne %s namespace %s", neName, namespace)
 	ne, err := repository.GetSingleton().GetNetworkElementByName(neName, namespace)
 	if err != nil {
 		logger.Logger.Error("Cannot get ne, err: ", err)
 		return nil, err
 	}
+	logger.Logger.Infof("Get network element info with ne %s namespace %s success with id %d", neName, namespace, ne.NeId)
 	return ne, nil
 }
 
