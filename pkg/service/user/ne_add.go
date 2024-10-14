@@ -12,7 +12,7 @@ func NeUserAdd(userId, neId uint) error {
 		NeId:   neId,
 	})
 	if err != nil {
-		logger.Logger.Error("Cannot add user ne from database: ", err)
+		logger.Logger.Error("Cannot add user ne into database: ", err)
 		return err
 	}
 	return nil

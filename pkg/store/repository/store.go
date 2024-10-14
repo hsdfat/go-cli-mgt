@@ -30,11 +30,16 @@ type UserRepository interface {
 	UserNeAdd(*models_api.UserNe) error
 	UserNeDelete(uint, uint) error
 	UserNeGet(uint, uint) (*models_api.UserNe, error)
+
+	UserRoleAdd(*models_api.UserRole) error
+	UserRoleGet(userId, roleId uint) (*models_api.UserRole, error)
+	UserRoleDelete(userId, roleId uint)
 }
 
 type RoleRepository interface {
 	GetRoleByUserId(uint) ([]models_db.Role, error)
 	GetRoleByName(string) (*models_api.Role, error)
+	GetListRole() ([]models_api.Role, error)
 	CreateRole(*models_api.Role) error
 	DeleteRole(*models_api.Role) error
 	UpdateRole(*models_api.Role) error

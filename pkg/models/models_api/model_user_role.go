@@ -8,9 +8,8 @@
  */
 package models_api
 
-type UserPermission struct {
-
-	Username string `json:"username,omitempty"`
-
-	Role string `json:"role,omitempty"`
+type UserRole struct {
+	Id     uint `json:"id"`
+	UserId uint `json:"user-id,omitempty"`
+	RoleId uint `json:"role-id,omitempty"`
 }

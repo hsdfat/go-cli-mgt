@@ -338,9 +338,127 @@ func Test04(t *testing.T) {
 	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
 	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
 
-	// Delete User
+	// Get Role from db again to verify
 	roleGetTest, err = role.GetRoleByName(roleTest.RoleName)
 	if errors.Is(err, models_error.ErrNotFoundRole) == false {
 		require.Error(t, errors.New("delete role un success"))
 	}
+}
+
+// Test05 testing login, create user, create role, add user role, delete user role, delete role, delete user
+func Test05(t *testing.T) {
+	// Create server
+	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+
+	// Login
+	// WARNING: This user must have been in db before
+	userReq := models_api.RequestUser{
+		Username: "userTest1",
+		Password: "userTest1",
+	}
+	tokenStr := Login(t, userReq, httpApp)
+
+	// Create User
+	userTest := models_api.User{
+		Username: random.StringRandom(10),
+		Password: random.StringRandom(20),
+		Email:    random.StringRandom(10),
+	}
+	CreateUser(t, userTest, tokenStr, httpApp)
+
+	// Create role
+	roleTest := models_api.Role{
+		RoleName:    random.StringRandom(10),
+		Priority:    random.StringRandom(10),
+		Description: random.StringRandom(30),
+	}
+	roleReqTest, err := json.Marshal(roleTest)
+	require.NoError(t, err)
+	req := httptest.NewRequest(http.MethodPost, "/mgt-svc/v1/role", bytes.NewBuffer(roleReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+
+	resp, err := httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusNotFound)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+
+	// Get User From DB
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, userGetTest)
+	require.Equal(t, userTest.Username, userGetTest.Username)
+	require.Equal(t, true, userGetTest.Active)
+	if bcrypt.Matches(userTest.Username+userTest.Password, userGetTest.Password) {
+		require.Error(t, errors.New("password in correct"))
+	}
+	require.NotZero(t, userGetTest.Id)
+	require.NotZero(t, userGetTest.CreatedDate)
+
+	// Get Role from db
+	roleGetTest, err := role.GetRoleByName(roleTest.RoleName)
+	require.NoError(t, err)
+	require.NotEmpty(t, roleGetTest)
+	require.NotEmpty(t, roleGetTest.RoleId)
+	require.Equal(t, roleTest.RoleName, roleGetTest.RoleName)
+	require.Equal(t, roleTest.Priority, roleGetTest.Priority)
+	require.Equal(t, roleTest.Description, roleGetTest.Description)
+
+	// Add User Role
+	userRoleTest := models_api.UserRole{
+		UserId: userGetTest.Id,
+		RoleId: roleGetTest.RoleId,
+	}
+	userRoleReqTest, err := json.Marshal(userRoleTest)
+	require.NoError(t, err)
+	req = httptest.NewRequest(http.MethodPost, "/mgt-svc/v1/user/role", bytes.NewBuffer(userRoleReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+	resp, err = httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+
+	// Get User Role from db
+	userRoleGetTest, err := user.RoleUserGet(userRoleTest.UserId, userRoleTest.RoleId)
+	require.NoError(t, err)
+	require.NotEmpty(t, userRoleGetTest)
+	require.NotZero(t, userRoleGetTest.Id)
+	require.Equal(t, userRoleTest.UserId, userRoleGetTest.UserId)
+	require.Equal(t, userRoleTest.RoleId, userRoleGetTest.RoleId)
+
+	// Delete User Role
+	req = httptest.NewRequest(http.MethodDelete, "/mgt-svc/v1/user/role", bytes.NewBuffer(userRoleReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+	resp, err = httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+
+	// Get User Role from db to verify again
+	userRoleGetTest, err = user.RoleUserGet(userRoleTest.UserId, userRoleTest.RoleId)
+	if !errors.Is(err, models_error.ErrNotFoundUserRole) {
+		require.Error(t, errors.New("delete user role un success"))
+	}
+
+	// Delete Role
+	req = httptest.NewRequest(http.MethodDelete, "/mgt-svc/v1/role", bytes.NewBuffer(roleReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+
+	resp, err = httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+
+	// Get Role from db again to verify
+	roleGetTest, err = role.GetRoleByName(roleTest.RoleName)
+	if errors.Is(err, models_error.ErrNotFoundRole) == false {
+		require.Error(t, errors.New("delete role un success"))
+	}
+
+	// Delete User
+	DeleteUser(t, userTest.Username)
 }

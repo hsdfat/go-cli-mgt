@@ -32,8 +32,8 @@ func NewFiber() *fiber.App {
 		// change password
 		userRouter.Post("change-password", user.ChangePasswordHandler)
 		// user's permissions
-		userRouter.Post("/role", user.PermissionAddHandler)
-		userRouter.Delete("/role", user.PermissionDeleteHandler)
+		userRouter.Post("/role", user.RoleAddHandler)
+		userRouter.Delete("/role", user.RoleDeleteHandler)
 		userRouter.Get("/role", user.PermissionGetHandler)
 		// user's network elements
 		userRouter.Post("/network-element", user.NetworkElementAddHandler)
@@ -52,7 +52,7 @@ func NewFiber() *fiber.App {
 	permissionRouter := router.Group("/role")
 	{
 		permissionRouter.Use(middleware.BasicAuth)
-		router.Get("/role", role.ListPermissionHandler)
+		router.Get("/role", role.ListRoleHandler)
 		router.Post("/role", role.CreateOrUpdateHandler)
 		router.Delete("/role", role.DeleteHandler)
 	}

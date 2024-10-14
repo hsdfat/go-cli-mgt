@@ -16,3 +16,12 @@ func GetRoleByName(roleName string) (*models_api.Role, error) {
 	logger.Logger.Info("Get role success from database with role name ", roleName)
 	return role, nil
 }
+
+func GetListRole() ([]models_api.Role, error) {
+	roleList, err := repository.GetSingleton().GetListRole()
+	if err != nil {
+		logger.Logger.Error("Cannot get role list, err: ", err)
+		return nil, err
+	}
+	return roleList, nil
+}

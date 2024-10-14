@@ -25,3 +25,7 @@ var (
 var (
 	ErrNotFoundRole = errors.New("role not found")
 )
+
+var (
+	ErrNotFoundUserRole = errors.New("user do not have this role")
+)

@@ -77,3 +77,26 @@ func (c *PgClient) UpdateRole(role *models_api.Role) error {
 	role.RoleId = id
 	return nil
 }
+
+func (c *PgClient) GetListRole() ([]models_api.Role, error) {
+	q := `SELECT id, role_name, description, priority FROM "role"`
+	rows, err := c.pool.Query(context.Background(), q)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var roleList []models_api.Role
+	for rows.Next() {
+		var role models_api.Role
+		err = rows.Scan(&role.RoleId, &role.RoleName, &role.Description, &role.Priority)
+		if err != nil {
+			return nil, err
+		}
+		roleList = append(roleList, role)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return roleList, nil
+}
