@@ -47,6 +47,8 @@ func TestCreateAndDeleteNe(t *testing.T) {
 	// Delete Ne
 	err = network_elements.DeleteNetworkElement(neGetTest.Name, neGetTest.Namespace)
 	require.NoError(t, err)
+
+	// Get Ne again to test
 	neGetTest, err = network_elements.GetNetworkElement(neTest.Name, neTest.Namespace)
 	if errors.Is(err, models_error.ErrNotFoundUser) == false {
 		require.Error(t, errors.New("delete user un success"))

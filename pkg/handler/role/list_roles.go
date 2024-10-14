@@ -1,4 +1,4 @@
-package permission
+package role
 
 import "github.com/gofiber/fiber/v2"
 

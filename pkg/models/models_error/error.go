@@ -21,3 +21,7 @@ var (
 var (
 	ErrNotFoundUserNe = errors.New("user do not have permission with ne")
 )
+
+var (
+	ErrNotFoundRole = errors.New("role not found")
+)

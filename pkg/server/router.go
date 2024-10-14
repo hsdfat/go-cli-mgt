@@ -5,7 +5,7 @@ import (
 	"go-cli-mgt/pkg/handler/auth"
 	"go-cli-mgt/pkg/handler/history"
 	"go-cli-mgt/pkg/handler/network_element"
-	"go-cli-mgt/pkg/handler/permission"
+	"go-cli-mgt/pkg/handler/role"
 	"go-cli-mgt/pkg/handler/user"
 	"go-cli-mgt/pkg/middleware"
 )
@@ -32,9 +32,9 @@ func NewFiber() *fiber.App {
 		// change password
 		userRouter.Post("change-password", user.ChangePasswordHandler)
 		// user's permissions
-		userRouter.Post("/permission", user.PermissionAddHandler)
-		userRouter.Delete("/permission", user.PermissionDeleteHandler)
-		userRouter.Get("/permission", user.PermissionGetHandler)
+		userRouter.Post("/role", user.PermissionAddHandler)
+		userRouter.Delete("/role", user.PermissionDeleteHandler)
+		userRouter.Get("/role", user.PermissionGetHandler)
 		// user's network elements
 		userRouter.Post("/network-element", user.NetworkElementAddHandler)
 		userRouter.Delete("/network-element", user.NetworkElementDeleteHandler)
@@ -45,16 +45,16 @@ func NewFiber() *fiber.App {
 	{
 		userListRouter.Use(middleware.BasicAuth)
 
-		userListRouter.Get("/permission", user.ListUsersPermissionHandler)
+		userListRouter.Get("/role", user.ListUsersPermissionHandler)
 		userListRouter.Get("/network-element", user.ListUsersNetworkElementHandler)
 		userListRouter.Get("/profile", user.ListUsersProfileHandler)
 	}
-	permissionRouter := router.Group("/permission")
+	permissionRouter := router.Group("/role")
 	{
 		permissionRouter.Use(middleware.BasicAuth)
-		permissionRouter.Get("/permission", permission.ListPermissionHandler)
-		permissionRouter.Post("/permission", permission.CreateOrUpdateHandler)
-		permissionRouter.Delete("/permission", permission.DeleteHandler)
+		router.Get("/role", role.ListPermissionHandler)
+		router.Post("/role", role.CreateOrUpdateHandler)
+		router.Delete("/role", role.DeleteHandler)
 	}
 	networkElementRouter := router.Group("/network-element")
 	{

@@ -9,12 +9,8 @@
 package models_api
 
 type Role struct {
-
-	RoleId int64 `json:"role-id,omitempty"`
-
-	RoleName string `json:"role-name,omitempty"`
-
-	Priority int32 `json:"priority,omitempty"`
-
+	RoleId      uint   `json:"role-id,omitempty"`
+	RoleName    string `json:"role-name,omitempty"`
+	Priority    string `json:"priority,omitempty"`
 	Description string `json:"description,omitempty"`
 }

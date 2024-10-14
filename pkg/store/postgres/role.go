@@ -2,8 +2,12 @@ package postgres
 
 import (
 	"context"
+	"errors"
+	pgxv4 "github.com/jackc/pgx/v4"
 	"go-cli-mgt/pkg/logger"
+	"go-cli-mgt/pkg/models/models_api"
 	"go-cli-mgt/pkg/models/models_db"
+	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
@@ -28,4 +32,48 @@ func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
 		return nil, err
 	}
 	return roleList, nil
+}
+
+func (c *PgClient) GetRoleByName(roleName string) (*models_api.Role, error) {
+	q := `SELECT id, role_name, description, priority FROM "role" WHERE role_name = $1`
+	row := c.pool.QueryRow(context.Background(), q, roleName)
+
+	var role models_api.Role
+	err := row.Scan(&role.RoleId, &role.RoleName, &role.Description, &role.Priority)
+	if errors.Is(err, pgxv4.ErrNoRows) {
+		return nil, models_error.ErrNotFoundRole
+	} else if err != nil {
+		return nil, err
+	}
+	return &role, nil
+}
+
+func (c *PgClient) CreateRole(role *models_api.Role) error {
+	q := `INSERT INTO "role" (role_name, description, priority) VALUES ($1, $2, $3) RETURNING id`
+	row := c.pool.QueryRow(context.Background(), q, role.RoleName, role.Description, role.Priority)
+	var id uint
+	err := row.Scan(&id)
+	if err != nil {
+		return err
+	}
+	role.RoleId = id
+	return nil
+}
+
+func (c *PgClient) DeleteRole(role *models_api.Role) error {
+	q := `DELETE FROM "role" WHERE role_name = $1 AND priority = $2`
+	_ = c.pool.QueryRow(context.Background(), q, role.RoleName, role.Priority)
+	return nil
+}
+
+func (c *PgClient) UpdateRole(role *models_api.Role) error {
+	q := `UPDATE "role" SET role_name = $1, description = $2, priority = $3 WHERE id = $4 RETURNING id`
+	row := c.pool.QueryRow(context.Background(), q, role.RoleName, role.Description, role.Priority, role.RoleId)
+	var id uint
+	err := row.Scan(&id)
+	if err != nil {
+		return err
+	}
+	role.RoleId = id
+	return nil
 }

@@ -109,9 +109,9 @@ CREATE TABLE "mme_files" (
 
 -- ALTER TABLE "user_ne" ADD FOREIGN KEY ("ne_id") REFERENCES "network_element" ("id");
 
-ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+-- ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
-ALTER TABLE "user_role" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
+-- ALTER TABLE "user_role" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
 
 ALTER TABLE "login_history" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 

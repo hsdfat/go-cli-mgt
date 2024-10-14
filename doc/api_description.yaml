@@ -262,7 +262,7 @@ paths:
             type: string
         - name: permission
           in: query
-          description: permission want to delete
+          description: role want to delete
           schema:
             type: string
       responses:
@@ -413,7 +413,7 @@ paths:
     get:
       tags:
         - Permission
-      operationId: Get permission list
+      operationId: Get role list
       requestBody:
         content:
           application/json:
