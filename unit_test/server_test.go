@@ -462,3 +462,68 @@ func Test05(t *testing.T) {
 	// Delete User
 	DeleteUser(t, userTest.Username)
 }
+
+// Test06 testing login, create user, change password user and delete user
+func Test06(t *testing.T) {
+	// Create server
+	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+
+	// Login
+	// WARNING: This user must have been in db before
+	userReq := models_api.RequestUser{
+		Username: "userTest1",
+		Password: "userTest1",
+	}
+	tokenStr := Login(t, userReq, httpApp)
+
+	// Create User
+	userTest := models_api.User{
+		Username: random.StringRandom(10),
+		Password: random.StringRandom(20),
+		Email:    random.StringRandom(10),
+	}
+	CreateUser(t, userTest, tokenStr, httpApp)
+
+	// Get User From DB
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, userGetTest)
+	require.Equal(t, userTest.Username, userGetTest.Username)
+	require.Equal(t, true, userGetTest.Active)
+	if bcrypt.Matches(userTest.Username+userTest.Password, userGetTest.Password) {
+		require.Error(t, errors.New("password in correct"))
+	}
+	require.NotZero(t, userGetTest.Id)
+	require.NotZero(t, userGetTest.CreatedDate)
+
+	// Change password user
+	newPassword := random.StringRandom(20)
+	userChangePasswordTest := models_api.ChangePassWord{
+		Username:    userTest.Username,
+		OldPassword: userTest.Password,
+		NewPassword: newPassword,
+	}
+	userChangePasswordReqTest, err := json.Marshal(userChangePasswordTest)
+	require.NoError(t, err)
+	req := httptest.NewRequest(http.MethodPost, "/mgt-svc/v1/auth/change-password", bytes.NewBuffer(userChangePasswordReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+
+	resp, err := httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusNotFound)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+
+	// Get User From Db again
+	userGetTest, err = user.GetProfileByUsername(userTest.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, userGetTest)
+	require.Equal(t, userTest.Username, userGetTest.Username)
+	if bcrypt.Matches(userTest.Username+newPassword, userGetTest.Password) {
+		require.Error(t, errors.New("password incorrect"))
+	}
+
+	// Delete User
+	DeleteUser(t, userTest.Username)
+}

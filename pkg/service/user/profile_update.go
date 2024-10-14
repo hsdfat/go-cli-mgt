@@ -14,3 +14,8 @@ func UpdateProfile(user *models_api.User) error {
 	}
 	return nil
 }
+
+func UpdatePassword(user *models_api.User) {
+	logger.Logger.Info("udpate password for user: ", user.Username)
+	repository.GetSingleton().UpdatePasswordUser(user)
+}

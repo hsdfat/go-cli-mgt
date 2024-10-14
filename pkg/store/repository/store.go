@@ -26,6 +26,7 @@ type UserRepository interface {
 	GetUserByUsername(string) (*models_api.User, error)
 	DeleteUser(string) error
 	UpdateUser(*models_api.User) error
+	UpdatePasswordUser(*models_api.User)
 
 	UserNeAdd(*models_api.UserNe) error
 	UserNeDelete(uint, uint) error

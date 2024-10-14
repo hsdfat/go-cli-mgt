@@ -35,6 +35,11 @@ func (c *PgClient) UpdateUser(user *models_api.User) error {
 	return nil
 }
 
+func (c *PgClient) UpdatePasswordUser(user *models_api.User) {
+	q := `UPDATE "user" SET password = $1 WHERE id = $2`
+	_ = c.pool.QueryRow(context.Background(), q, user.Password, user.Id)
+}
+
 func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 	query := `SELECT id, username, email, password FROM "user" WHERE id = $1`
 	row := c.pool.QueryRow(context.Background(), query, id)
