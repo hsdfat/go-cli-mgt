@@ -19,8 +19,9 @@ func Initialize(filenames ...string) *fiber.App {
 	}
 	cfg := &models_config.Config{
 		Svr: models_config.ServerConfig{
-			Host: os.Getenv("SERVER_HOST"),
-			Port: os.Getenv("SERVER_PORT"),
+			Host:    os.Getenv("SERVER_HOST"),
+			Port:    os.Getenv("SERVER_PORT"),
+			TcpPort: os.Getenv("SERVER_TCP_PORT"),
 		},
 		Db: models_config.DatabaseConfig{
 			DbType: os.Getenv("DB_DRIVER"),

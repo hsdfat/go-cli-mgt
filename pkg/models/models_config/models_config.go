@@ -12,6 +12,7 @@ type ServerConfig struct {
 	ServerName string
 	Host       string
 	Port       string
+	TcpPort    string
 }
 
 type RouterConfig struct {

@@ -13,6 +13,7 @@ func main() {
 
 	go server.ListenAndServe(httpServer)
 
+	go server.StartTCPServer()
 	stopOrKillServer()
 }
 
