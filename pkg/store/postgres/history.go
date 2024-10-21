@@ -27,7 +27,7 @@ func (c *PgClient) GetHistoryById(id uint64) (*models_api.History, error) {
 	var history models_api.History
 	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUser
+		return nil, models_error.ErrNotFoundHistory
 	} else if err != nil {
 		return nil, err
 	}
@@ -44,6 +44,45 @@ func (c *PgClient) DeleteHistoryById(id uint64) error {
 func (c *PgClient) GetHistoryListByMode(mode string) ([]models_api.History, error) {
 	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE mode = $1`
 	rows, err := c.pool.Query(context.Background(), q, mode)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var histories []models_api.History
+	for rows.Next() {
+		var history models_api.History
+		err = rows.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
+		if err != nil {
+			return nil, err
+		}
+		histories = append(histories, history)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return histories, nil
+}
+
+// GetRecordHistoryByCommand This function only use for test check if existed record in database
+func (c *PgClient) GetRecordHistoryByCommand(command string) (*models_api.History, error) {
+	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE command = $1`
+	row := c.pool.QueryRow(context.Background(), q, command)
+	var history models_api.History
+	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, models_error.ErrNotFoundHistory
+	} else if err != nil {
+		return nil, err
+	}
+
+	return &history, nil
+}
+
+func (c *PgClient) GetHistoryCommandByModeLimit(mode string, limit int) ([]models_api.History, error) {
+	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE mode = $1 ORDER BY id DESC LIMIT $2`
+	rows, err := c.pool.Query(context.Background(), q, mode, limit)
 	if err != nil {
 		return nil, err
 	}

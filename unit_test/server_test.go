@@ -8,6 +8,7 @@ import (
 	"go-cli-mgt/pkg/models/models_api"
 	"go-cli-mgt/pkg/models/models_error"
 	"go-cli-mgt/pkg/server"
+	historyService "go-cli-mgt/pkg/service/history"
 	"go-cli-mgt/pkg/service/network_elements"
 	"go-cli-mgt/pkg/service/role"
 	"go-cli-mgt/pkg/service/user"
@@ -16,12 +17,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
+
+const EnvPath = "E:\\Data\\Go\\go-cli-mgt\\.env"
 
 // Test01 Testing login, create and disable user
 func Test01(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -70,7 +74,7 @@ func Test01(t *testing.T) {
 // Test02 Testing login, Create ne and delete ne
 func Test02(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -142,7 +146,7 @@ func Test02(t *testing.T) {
 // Test03 testing login, create user, create ne, add user ne, delete user ne, delete ne, delete user
 func Test03(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -269,7 +273,7 @@ func Test03(t *testing.T) {
 // Test04 testing login, create role, update role, delete role
 func Test04(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -348,7 +352,7 @@ func Test04(t *testing.T) {
 // Test05 testing login, create user, create role, add user role, delete user role, delete role, delete user
 func Test05(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -466,7 +470,7 @@ func Test05(t *testing.T) {
 // Test06 testing login, create user, change password user and delete user
 func Test06(t *testing.T) {
 	// Create server
-	httpApp := server.Initialize("E:\\Data\\Go\\go-cli-mgt\\.env")
+	httpApp := server.Initialize(EnvPath)
 
 	// Login
 	// WARNING: This user must have been in db before
@@ -523,6 +527,79 @@ func Test06(t *testing.T) {
 	if bcrypt.Matches(userTest.Username+newPassword, userGetTest.Password) {
 		require.Error(t, errors.New("password incorrect"))
 	}
+
+	// Delete User
+	DeleteUser(t, userTest.Username)
+}
+
+// Test07 testing login, create user, save history command, delete history, delete user
+func Test07(t *testing.T) {
+	// Create server
+	httpApp := server.Initialize(EnvPath)
+
+	// Login
+	// WARNING: This user must have been in db before
+	userReq := models_api.RequestUser{
+		Username: "userTest1",
+		Password: "userTest1",
+	}
+	tokenStr := Login(t, userReq, httpApp)
+
+	// Create User
+	userTest := models_api.User{
+		Username: random.StringRandom(10),
+		Password: random.StringRandom(20),
+		Email:    random.StringRandom(10),
+	}
+	CreateUser(t, userTest, tokenStr, httpApp)
+
+	// Get User From DB
+	userGetTest, err := user.GetProfileByUsername(userTest.Username)
+	require.NoError(t, err)
+	require.NotEmpty(t, userGetTest)
+	require.Equal(t, userTest.Username, userGetTest.Username)
+	require.Equal(t, true, userGetTest.Active)
+	if bcrypt.Matches(userTest.Username+userTest.Password, userGetTest.Password) {
+		require.Error(t, errors.New("password in correct"))
+	}
+	require.NotZero(t, userGetTest.Id)
+	require.NotZero(t, userGetTest.CreatedDate)
+
+	// save history
+	historyTest := models_api.History{
+		Username:     userReq.Username,
+		UserIp:       random.Ipv4Random(),
+		Command:      random.StringRandom(50),
+		NeName:       random.StringRandom(10),
+		Result:       random.BooleanRandom(),
+		ExecutedTime: time.Now(),
+		Mode:         random.StringRandom(10),
+	}
+	historyReqTest, err := json.Marshal(historyTest)
+	require.NoError(t, err)
+	req := httptest.NewRequest(http.MethodPost, "/mgt-svc/v1/history", bytes.NewBuffer(historyReqTest))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", tokenStr)
+
+	resp, err := httpApp.Test(req)
+	require.NotEqual(t, resp.StatusCode, http.StatusNotFound)
+	require.NotEqual(t, resp.StatusCode, http.StatusForbidden)
+	require.NotEqual(t, resp.StatusCode, http.StatusInternalServerError)
+	require.NotEqual(t, resp.StatusCode, http.StatusBadRequest)
+	// get history
+	historyGetTest, err := historyService.GetHistoryByCommand(historyTest.Command)
+	require.NoError(t, err)
+	require.NotEmpty(t, historyGetTest)
+	require.NotZero(t, historyGetTest.Id)
+	require.Equal(t, historyTest.Username, historyGetTest.Username)
+	require.Equal(t, historyTest.UserIp, historyGetTest.UserIp)
+	require.Equal(t, historyTest.Command, historyGetTest.Command)
+	require.Equal(t, historyTest.NeName, historyGetTest.NeName)
+	require.Equal(t, historyTest.Result, historyGetTest.Result)
+	require.Equal(t, historyTest.Mode, historyGetTest.Mode)
+
+	// delete history
+	err = historyService.DeleteHistoryById(historyTest.Id)
 
 	// Delete User
 	DeleteUser(t, userTest.Username)

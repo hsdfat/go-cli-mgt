@@ -48,3 +48,11 @@ func Ipv4Random() string {
 	sb.WriteString(NumberStringRandom(2))
 	return sb.String()
 }
+
+func BooleanRandom() bool {
+	num := IntRandom(1, 10)
+	if num%2 == 0 {
+		return true
+	}
+	return false
+}

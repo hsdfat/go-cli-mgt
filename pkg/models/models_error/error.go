@@ -29,3 +29,7 @@ var (
 var (
 	ErrNotFoundUserRole = errors.New("user do not have this role")
 )
+
+var (
+	ErrNotFoundHistory = errors.New("history command not found")
+)

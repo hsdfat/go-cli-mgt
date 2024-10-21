@@ -59,6 +59,8 @@ type HistoryRepository interface {
 	GetHistoryById(uint64) (*models_api.History, error)
 	DeleteHistoryById(uint64) error
 	GetHistoryListByMode(string) ([]models_api.History, error)
+	GetRecordHistoryByCommand(string) (*models_api.History, error)
+	GetHistoryCommandByModeLimit(string, int) ([]models_api.History, error)
 }
 
 type LoginRepository interface {

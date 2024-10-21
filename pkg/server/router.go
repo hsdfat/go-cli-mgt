@@ -66,8 +66,8 @@ func NewFiber() *fiber.App {
 	historyRouter := router.Group("/history")
 	{
 		historyRouter.Use(middleware.BasicAuth)
-		historyRouter.Post("/history", history.SaveHistoryHandler)
-		historyRouter.Get("/history", history.GetHistoryHandler)
+		router.Post("/history", history.SaveHistoryHandler)
+		router.Get("/history", history.GetHistoryHandler)
 	}
 	return app
 }

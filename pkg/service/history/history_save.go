@@ -7,11 +7,13 @@ import (
 	"time"
 )
 
-func SaveHistoryCommand(history *models_api.History) {
+func SaveHistoryCommand(history *models_api.History) error {
 	err := repository.GetSingleton().SaveHistory(history)
 	if err != nil {
 		logger.Logger.Error("Cannot save history command to database, err: ", err)
+		return err
 	}
+	return nil
 }
 
 func SaveHistoryCommandSuccess(history *models_api.History) error {
