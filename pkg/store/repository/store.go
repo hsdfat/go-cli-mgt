@@ -2,6 +2,7 @@ package repository
 
 import (
 	"go-cli-mgt/pkg/config"
+	"go-cli-mgt/pkg/store/mysql"
 	"go-cli-mgt/pkg/store/postgres"
 )
 
@@ -17,7 +18,7 @@ func Init() {
 	cfg := config.GetDatabaseConfig()
 	switch cfg.DbType {
 	case "mysql":
-		// store = mysql.GetInstance()
+		store = mysql.GetInstance()
 	case "postgresql":
 		store = postgres.GetInstance()
 	default:
