@@ -59,6 +59,7 @@ type HistoryRepository interface {
 	GetHistoryListByMode(string) ([]models_api.History, error)
 	GetRecordHistoryByCommand(string) (*models_api.History, error)
 	GetHistoryCommandByModeLimit(string, int) ([]models_api.History, error)
+	GetHistorySavingLog(neSiteName string) ([]models_api.History, error)
 }
 
 type LoginRepository interface {

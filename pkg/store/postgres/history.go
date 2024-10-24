@@ -103,3 +103,27 @@ func (c *PgClient) GetHistoryCommandByModeLimit(mode string, limit int) ([]model
 
 	return histories, nil
 }
+
+func (c *PgClient) GetHistorySavingLog(neSiteName string) ([]models_api.History, error) {
+	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE ne_name = $1 AND executed_time >= NOW() - INTERVAL '1 day'`
+	rows, err := c.pool.Query(context.Background(), q, neSiteName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var histories []models_api.History
+	for rows.Next() {
+		var history models_api.History
+		err = rows.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
+		if err != nil {
+			return nil, err
+		}
+		histories = append(histories, history)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return histories, nil
+}

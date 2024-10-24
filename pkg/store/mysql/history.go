@@ -31,3 +31,8 @@ func (c *Client) GetHistoryCommandByModeLimit(s string, i int) ([]models_api.His
 	//TODO implement me
 	panic("implement me")
 }
+
+func (c *Client) GetHistorySavingLog(neSiteName string) ([]models_api.History, error) {
+	//TODO implement me
+	panic("implement me")
+}

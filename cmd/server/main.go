@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-cli-mgt/pkg/server"
+	"go-cli-mgt/pkg/service/cronjob"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +13,7 @@ func main() {
 	httpServer := server.Initialize()
 
 	go server.ListenAndServe(httpServer)
-
+	go cronjob.InitCronjobList()
 	go server.StartTCPServer()
 	stopOrKillServer()
 }
