@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// Todo: Get from file or .env
 var secretKey = []byte("optimus-prime-auto-bot")
 var prefixKey = "Basic "
 
