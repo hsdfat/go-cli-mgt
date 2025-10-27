@@ -3,11 +3,11 @@ package postgres
 import (
 	"context"
 	"errors"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_db "go-cli-mgt/pkg/models/db"
+	models_error "go-cli-mgt/pkg/models/error"
+
 	pgxv4 "github.com/jackc/pgx/v4"
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_db"
-	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
@@ -22,7 +22,6 @@ func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
 		var role models_db.Role
 		err = rows.Scan(&role.Id, &role.RoleName, &role.Description, &role.Priority)
 		if err != nil {
-			logger.Logger.Errorln("Error scanning", err)
 			return nil, err
 		}
 		roleList = append(roleList, role)

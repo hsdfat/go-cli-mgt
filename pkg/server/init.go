@@ -1,22 +1,24 @@
 package server
 
 import (
+	"fmt"
 	"go-cli-mgt/pkg/config"
 	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/models/models_config"
+	models_config "go-cli-mgt/pkg/models/config"
 	"go-cli-mgt/pkg/store/repository"
-	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
 
-func Initialize(filenames ...string) *fiber.App {
-	err := godotenv.Load(filenames...)
+func Initialize(configFile string) *fiber.App {
+	err := godotenv.Load(configFile)
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		panic(fmt.Errorf("unable to find config %v, %s", configFile, err.Error()))
 	}
+	fmt.Printf("Loaded configs %v \n", configFile)
+
 	cfg := &models_config.Config{
 		Svr: models_config.ServerConfig{
 			Host:    os.Getenv("SERVER_HOST"),
@@ -25,6 +27,13 @@ func Initialize(filenames ...string) *fiber.App {
 		},
 		Db: models_config.DatabaseConfig{
 			DbType: os.Getenv("DB_DRIVER"),
+			Mysql: models_config.MySqlConfig{
+				Host:     os.Getenv("MYSQL_HOST"),
+				Port:     os.Getenv("MYSQL_PORT"),
+				User:     os.Getenv("MYSQL_USER"),
+				Password: os.Getenv("MYSQL_PASSWORD"),
+				Name:     os.Getenv("MYSQL_DB_NAME"),
+			},
 			Pgsql: models_config.PostgresConfig{
 				Host:     os.Getenv("PG_HOST"),
 				Port:     os.Getenv("PG_PORT"),
@@ -39,6 +48,7 @@ func Initialize(filenames ...string) *fiber.App {
 			DbLevel: os.Getenv("DB_LOG_LEVEL"),
 		},
 	}
+
 	config.Init(cfg)
 	logger.Init()
 	repository.Init()

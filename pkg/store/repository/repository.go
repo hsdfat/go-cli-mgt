@@ -1,14 +1,11 @@
 package repository
 
 import (
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_config"
-	"go-cli-mgt/pkg/models/models_db"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_db "go-cli-mgt/pkg/models/db"
 )
 
 type DatabaseStore interface {
-	Init(cfg models_config.DatabaseConfig) error
-
 	UserRepository
 	LoginRepository
 	HistoryRepository

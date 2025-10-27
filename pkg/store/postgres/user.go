@@ -3,11 +3,11 @@ package postgres
 import (
 	"context"
 	"errors"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_error "go-cli-mgt/pkg/models/error"
+
 	pgxv4 "github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v5"
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) CreateUser(user *models_api.User) error {
@@ -82,7 +82,6 @@ func (c *PgClient) ListUsers() ([]models_api.User, error) {
 		var user models_api.User
 		err = rows.Scan(&user.Id, &user.Username, &user.Email)
 		if err != nil {
-			logger.Logger.Errorln("Error scanning", err)
 			return nil, err
 		}
 		users = append(users, user)

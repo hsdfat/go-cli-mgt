@@ -15,16 +15,18 @@ func GetSingleton() DatabaseStore {
 }
 
 func Init() {
+	var err error
 	cfg := config.GetDatabaseConfig()
 	switch cfg.DbType {
 	case "mysql":
-		store = mysql.GetInstance()
+		store, err = mysql.NewClient(cfg)
 	case "postgresql":
-		store = postgres.GetInstance()
+		store, err = postgres.NewClient(cfg)
+	//case "aerospike":
+	//	store = aerospikes.GetInstance()
 	default:
 		panic("unsupported database type")
 	}
-	err := store.Init(cfg)
 	if err != nil {
 		panic("cant init store")
 	}

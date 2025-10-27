@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_db"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_db "go-cli-mgt/pkg/models/db"
 )
 
 func (c *Client) GetRoleByUserId(u uint) ([]models_db.Role, error) {

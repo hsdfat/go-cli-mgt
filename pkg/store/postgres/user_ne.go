@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"errors"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_error "go-cli-mgt/pkg/models/error"
+
 	"github.com/jackc/pgx/v4"
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) UserNeAdd(userNe *models_api.UserNe) error {
@@ -41,11 +42,3 @@ func (c *PgClient) UserNeGet(userId, neId uint) (*models_api.UserNe, error) {
 
 	return &userNe, nil
 }
-
-//func (c *PgClient) UserNeGetByUserId(userId uint) ([]models_api.UserNe, error) {
-//	q := `SELECT id, user_id, ne_id FROM "user_ne" WHERE user_id = $1`
-//	row := c.pool.QueryRow(context.Background(), q, userId)
-//
-//	var userNeList []models_api.UserNe
-//	for
-//}

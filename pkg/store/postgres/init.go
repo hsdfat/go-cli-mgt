@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/models/models_config"
+	models_config "go-cli-mgt/pkg/models/config"
 	"os"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -15,18 +15,7 @@ type PgClient struct {
 	cfg  models_config.PostgresConfig
 }
 
-var (
-	client *PgClient
-)
-
-func GetInstance() *PgClient {
-	if client == nil {
-		client = &PgClient{}
-	}
-	return client
-}
-
-func (c *PgClient) Init(cfg models_config.DatabaseConfig) error {
+func NewClient(cfg models_config.DatabaseConfig) (*PgClient, error) {
 	// Initialize PostgreSQL database connection
 	logger.Logger.Debugf("Initializing PostgreSQL database connection with config %v", cfg)
 	databaseUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
@@ -39,7 +28,20 @@ func (c *PgClient) Init(cfg models_config.DatabaseConfig) error {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	c.pool = dbPool
-	c.cfg = cfg.Pgsql
-	return nil
+	c := &PgClient{
+		pool: dbPool,
+		cfg:  cfg.Pgsql,
+	}
+	return c, nil
+}
+
+var (
+	client *PgClient
+)
+
+func GetInstance() *PgClient {
+	if client == nil {
+		client = &PgClient{}
+	}
+	return client
 }

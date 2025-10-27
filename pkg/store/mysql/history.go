@@ -1,6 +1,6 @@
 package mysql
 
-import "go-cli-mgt/pkg/models/models_api"
+import models_api "go-cli-mgt/pkg/models/api"
 
 func (c *Client) SaveHistory(history *models_api.History) error {
 	//TODO implement me

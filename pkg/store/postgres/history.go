@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"errors"
+	models_api "go-cli-mgt/pkg/models/api"
+	models_error "go-cli-mgt/pkg/models/error"
+
 	"github.com/jackc/pgx/v4"
-	"go-cli-mgt/pkg/models/models_api"
-	"go-cli-mgt/pkg/models/models_error"
 )
 
 func (c *PgClient) SaveHistory(history *models_api.History) error {
