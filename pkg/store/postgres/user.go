@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	pgxv4 "github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v5"
@@ -47,7 +46,7 @@ func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUser
+		return nil, errors.New("user not found")
 	} else if err != nil {
 		return nil, err
 	}
@@ -62,7 +61,7 @@ func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) 
 	var user models_api.User
 	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate, &user.DisableDate)
 	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUser
+		return nil, errors.New("user not found")
 	} else if err != nil {
 		return nil, err
 	}

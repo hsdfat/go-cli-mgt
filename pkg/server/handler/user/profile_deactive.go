@@ -1,10 +1,8 @@
 package user
 
 import (
-	"errors"
 	"go-cli-mgt/pkg/logger"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 	"go-cli-mgt/pkg/svc"
 	"go-cli-mgt/pkg/utils/response"
 
@@ -32,13 +30,6 @@ func ProfileDeactivateHandler(c *fiber.Ctx) error {
 
 	err = svc.DisableProfile(user.Username, username)
 	if err != nil {
-		if errors.Is(err, models_error.ErrDisableUser) {
-			logger.Logger.Info("username already disable")
-			response.BadRequest(c, "username already disable")
-			svc.SaveHistoryCommandFailure(historyCommand)
-			return err
-		}
-
 		svc.SaveHistoryCommandFailure(historyCommand)
 		logger.Logger.Error("Error Disable user: ", err)
 		response.InternalError(c, "Error Disable user")

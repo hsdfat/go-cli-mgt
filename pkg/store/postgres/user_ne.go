@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -35,7 +34,7 @@ func (c *PgClient) UserNeGet(userId, neId uint) (*models_api.UserNe, error) {
 	var userNe models_api.UserNe
 	err := row.Scan(&userNe.Id, &userNe.UserId, &userNe.NeId)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUserNe
+		return nil, errors.New("user do not have permission with ne")
 	} else if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package middleware
 import (
 	"errors"
 	"go-cli-mgt/pkg/logger"
-	models_error "go-cli-mgt/pkg/models/error"
 	"go-cli-mgt/pkg/utils/response"
 	"go-cli-mgt/pkg/utils/token"
 	"strings"
@@ -16,6 +15,12 @@ const (
 	RoleContextKey     = "role"
 )
 
+var (
+	MissingAuthHeader = errors.New("missing authorize header")
+	InvalidAuthHeader = errors.New("authorize header of request invalid")
+	InvalidToken      = errors.New("invalid token")
+)
+
 // BasicAuth for Authenticate middleware
 func BasicAuth(c *fiber.Ctx) error {
 	// Basic auth implementation
@@ -24,29 +29,29 @@ func BasicAuth(c *fiber.Ctx) error {
 	if authorizeHeaders == nil {
 		logger.Logger.Error("Request don't have authorize header")
 		response.Unauthorized(c)
-		return models_error.MissingAuthHeader
+		return MissingAuthHeader
 	}
 	authHeader := c.GetReqHeaders()["Authorization"][0]
 	if authHeader == "" {
 		logger.Logger.Error("Request don't have authorize header")
 		response.Unauthorized(c)
-		return models_error.MissingAuthHeader
+		return MissingAuthHeader
 	}
 
 	authHeaderParts := strings.SplitN(authHeader, " ", 2)
 	if len(authHeaderParts) != 2 || authHeaderParts[0] != "Basic" {
 		logger.Logger.Error("Authorize header of request invalid")
 		response.Unauthorized(c)
-		return models_error.InvalidAuthHeader
+		return InvalidAuthHeader
 	}
 
 	tokenStr := authHeaderParts[1]
 	username, roles, err := token.ParseToken(tokenStr)
 	if err != nil {
-		if errors.Is(err, models_error.InvalidToken) {
+		if errors.Is(err, InvalidToken) {
 			logger.Logger.Error("Token invalid")
 			response.Unauthorized(c)
-			return models_error.InvalidToken
+			return InvalidToken
 		}
 
 		logger.Logger.Error("Cannot verify token: ", err)

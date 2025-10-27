@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -35,7 +34,7 @@ func (c *PgClient) GetNetworkElementByName(neName string, namespace string) (*mo
 	var ne models_api.NeData
 	err := row.Scan(&ne.NeId, &ne.Name, &ne.Type, &ne.Namespace, &ne.MasterIpConfig, &ne.MasterPortConfig, &ne.SlaveIpConfig, &ne.SlavePortConfig, &ne.Url, &ne.IpCommand, &ne.PortCommand)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundNe
+		return nil, errors.New("network element not found")
 	} else if err != nil {
 		return nil, err
 	}

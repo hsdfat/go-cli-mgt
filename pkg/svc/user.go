@@ -1,10 +1,8 @@
 package svc
 
 import (
-	"errors"
 	"go-cli-mgt/pkg/logger"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 	"go-cli-mgt/pkg/store/repository"
 	"go-cli-mgt/pkg/utils/bcrypt"
 	"time"
@@ -13,10 +11,8 @@ import (
 func CreateProfile(user models_api.User) error {
 	userDb, err := repository.GetSingleton().GetUserByUsername(user.Username)
 	if err != nil {
-		if !errors.Is(err, models_error.ErrNotFoundUser) {
-			logger.Logger.Error("Cannot get user by username from db, username: ", user.Username, " err: ", err)
-			return err
-		}
+		logger.Logger.Error("Cannot get user by username from db, username: ", user.Username, " err: ", err)
+		return err
 	}
 
 	if userDb != nil && !userDb.Active {
@@ -48,10 +44,8 @@ func CreateProfile(user models_api.User) error {
 func DeleteProfile(username string) error {
 	_, err := repository.GetSingleton().GetUserByUsername(username)
 	if err != nil {
-		if !errors.Is(err, models_error.ErrNotFoundUser) {
-			logger.Logger.Error("Cannot get user by username from database: ", err)
-			return err
-		}
+		logger.Logger.Error("Cannot get user by username from database: ", err)
+		return err
 	}
 	err = repository.GetSingleton().DeleteUser(username)
 	if err != nil {
@@ -70,7 +64,7 @@ func DisableProfile(username string, userDeactivate string) error {
 	}
 
 	if !user.Active {
-		return models_error.ErrDisableUser
+		return nil
 	}
 
 	user.Active = false

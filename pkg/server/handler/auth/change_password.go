@@ -1,10 +1,8 @@
 package auth
 
 import (
-	"errors"
 	"go-cli-mgt/pkg/logger"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 	"go-cli-mgt/pkg/svc"
 	"go-cli-mgt/pkg/utils/bcrypt"
 	"go-cli-mgt/pkg/utils/response"
@@ -32,12 +30,6 @@ func ChangePasswordHandler(c *fiber.Ctx) error {
 	logger.Logger.Info("Handler Change password for user: ", userChangePassword.Username)
 	user, err := svc.GetProfileByUsername(userChangePassword.Username)
 	if err != nil {
-		if errors.Is(err, models_error.ErrNotFoundUser) {
-			logger.Logger.Info("user does not existed")
-			response.BadRequest(c, "user does not existed")
-			svc.SaveHistoryCommandFailure(historyCommand)
-			return err
-		}
 		logger.Logger.Error("Error get user: ", err)
 		response.InternalError(c, "Error get user")
 		svc.SaveHistoryCommandFailure(historyCommand)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -28,7 +27,7 @@ func (c *PgClient) GetHistoryById(id uint64) (*models_api.History, error) {
 	var history models_api.History
 	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundHistory
+		return nil, errors.New("history command not found")
 	} else if err != nil {
 		return nil, err
 	}
@@ -73,7 +72,7 @@ func (c *PgClient) GetRecordHistoryByCommand(command string) (*models_api.Histor
 	var history models_api.History
 	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundHistory
+		return nil, errors.New("history command not found")
 	} else if err != nil {
 		return nil, err
 	}

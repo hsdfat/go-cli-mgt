@@ -5,7 +5,6 @@ import (
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
 	models_db "go-cli-mgt/pkg/models/db"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	pgxv4 "github.com/jackc/pgx/v4"
 )
@@ -40,7 +39,7 @@ func (c *PgClient) GetRoleByName(roleName string) (*models_api.Role, error) {
 	var role models_api.Role
 	err := row.Scan(&role.RoleId, &role.RoleName, &role.Description, &role.Priority)
 	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, models_error.ErrNotFoundRole
+		return nil, errors.New("role not found")
 	} else if err != nil {
 		return nil, err
 	}

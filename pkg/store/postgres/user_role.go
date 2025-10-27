@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	models_api "go-cli-mgt/pkg/models/api"
-	models_error "go-cli-mgt/pkg/models/error"
 
 	"github.com/jackc/pgx/v4"
 )
@@ -29,7 +28,7 @@ func (c *PgClient) UserRoleGet(userId, roleId uint) (*models_api.UserRole, error
 	var userRole models_api.UserRole
 	err := row.Scan(&userRole.Id, &userRole.UserId, &userRole.RoleId)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, models_error.ErrNotFoundUserRole
+		return nil, errors.New("user do not have this role")
 	} else if err != nil {
 		return nil, err
 	}
