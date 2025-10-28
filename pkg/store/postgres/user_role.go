@@ -1,43 +1,56 @@
 package postgres
 
 import (
-	"context"
 	"errors"
 
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 
-	"github.com/jackc/pgx/v4"
+	"gorm.io/gorm"
 )
 
-func (c *PgClient) UserRoleAdd(userRole *models_api.UserRole) error {
-	query := `INSERT INTO "user_role" (user_id, role_id) VALUES ($1, $2) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, userRole.UserId, userRole.RoleId)
-
-	var id uint
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// UserRoleAdd adds a user-role relationship
+func (c *PgClient) UserRoleAdd(userRoleDB *models_db.UserRole) error {
+	// Create user_role record using GORM
+	result := c.Db.Create(userRoleDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to add user-role relationship: %v", result.Error)
+		return result.Error
 	}
-	userRole.Id = id
+
+	logger.Logger.Infof("User-Role relationship added successfully: UserID %d, RoleID %d", userRoleDB.UserID, userRoleDB.RoleID)
 	return nil
 }
 
-func (c *PgClient) UserRoleGet(userId, roleId uint) (*models_api.UserRole, error) {
-	q := `SELECT id, user_id, role_id FROM "user_role" WHERE user_id = $1 AND role_id = $2`
-	row := c.pool.QueryRow(context.Background(), q, userId, roleId)
+// UserRoleGet retrieves a user-role relationship
+func (c *PgClient) UserRoleGet(userId, roleId uint) (*models_db.UserRole, error) {
+	var userRoleDB models_db.UserRole
 
-	var userRole models_api.UserRole
-	err := row.Scan(&userRole.Id, &userRole.UserId, &userRole.RoleId)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, errors.New("user do not have this role")
-	} else if err != nil {
-		return nil, err
+	result := c.Db.Where("user_id = ? AND role_id = ?", userId, roleId).First(&userRoleDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("User-Role relationship not found: UserID %d, RoleID %d", userId, roleId)
+			return nil, errors.New("user do not have this role")
+		}
+		logger.Logger.Errorf("Failed to get user-role relationship: %v", result.Error)
+		return nil, result.Error
 	}
 
-	return &userRole, nil
+	return &userRoleDB, nil
 }
 
+// UserRoleDelete deletes a user-role relationship
 func (c *PgClient) UserRoleDelete(userId, roleId uint) {
-	query := `DELETE FROM "user_role" WHERE user_id = $1 AND role_id = $2`
-	_ = c.pool.QueryRow(context.Background(), query, userId, roleId)
+	result := c.Db.Where("user_id = ? AND role_id = ?", userId, roleId).Delete(&models_db.UserRole{})
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to delete user-role relationship: %v", result.Error)
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No user-role relationship found: UserID %d, RoleID %d", userId, roleId)
+		return
+	}
+
+	logger.Logger.Infof("User-Role relationship deleted successfully: UserID %d, RoleID %d", userId, roleId)
 }

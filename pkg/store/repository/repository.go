@@ -1,66 +1,73 @@
 package repository
 
 import (
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
 	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 )
 
-type DatabaseStore interface {
-	UserRepository
-	LoginRepository
-	HistoryRepository
-	RoleRepository
-	NetworkElementRepository
-	MmeCommandRepository
+type IDatabaseStore interface {
+	Ping() error
+
+	IUserRepository
+	IRoleRepository
+	IHistoryRepository
+	INetworkElementRepository
+	IUserNeRepository
+	IUserRoleRepository
+	ILoginRepository
+	IMmeCommandRepository
 }
 
-type UserRepository interface {
-	CreateUser(*models_api.User) error
-	GetUserByID(uint) (*models_api.User, error)
-	ListUsers() ([]models_api.User, error)
-	GetUserByUsername(string) (*models_api.User, error)
-	DeleteUser(string) error
-	UpdateUser(*models_api.User) error
-	UpdatePasswordUser(*models_api.User)
+type IUserRepository interface {
+	CreateUser(userDB *models_db.User) error
+	DeleteUser(username string) error
+	UpdateUser(userUpdate *models_db.User) error
+	UpdatePasswordUser(userDB *models_db.User)
+	GetUserByID(id uint) (*models_db.User, error)
+	GetUserByUsername(username string) (*models_db.User, error)
+	ListUsers() ([]models_db.User, error)
+}
 
-	UserNeAdd(*models_api.UserNe) error
-	UserNeDelete(uint, uint) error
-	UserNeGet(uint, uint) (*models_api.UserNe, error)
+type IRoleRepository interface {
+	GetRoleByUserId(userId uint) ([]models_db.Role, error)
+	GetRoleByName(roleName string) (*models_db.Role, error)
+	GetListRole() ([]models_db.Role, error)
+	CreateRole(roleDB *models_db.Role) error
+	DeleteRole(roleDB *models_db.Role) error
+	UpdateRole(roleDB *models_db.Role) error
+}
 
-	UserRoleAdd(*models_api.UserRole) error
-	UserRoleGet(userId, roleId uint) (*models_api.UserRole, error)
+type INetworkElementRepository interface {
+	CreateNetworkElement(neDB *models_db.NetworkElement) error
+	DeleteNetworkElementByName(neName string, namespace string) error
+	GetNetworkElementByName(neName string, namespace string) (*models_db.NetworkElement, error)
+	GetListNetworkElement() ([]models_db.NetworkElement, error)
+	GetNetworkElementByUserName(userName string) ([]models_db.NetworkElement, error)
+}
+
+type IHistoryRepository interface {
+	SaveHistory(historyDB *models_db.OperationHistory) error
+	GetHistoryById(id uint64) (*models_db.OperationHistory, error)
+	DeleteHistoryById(id uint64) error
+	GetHistoryListByMode(mode string) ([]models_db.OperationHistory, error)
+	GetRecordHistoryByCommand(command string) (*models_db.OperationHistory, error)
+	GetHistoryCommandByModeLimit(mode string, limit int) ([]models_db.OperationHistory, error)
+	GetHistorySavingLog(neSiteName string) ([]models_db.OperationHistory, error)
+}
+
+type IUserNeRepository interface {
+	UserNeAdd(userNeDB *models_db.UserNe) error
+	UserNeDelete(userId, neId uint) error
+	UserNeGet(userId, neId uint) (*models_db.UserNe, error)
+}
+
+type IUserRoleRepository interface {
+	UserRoleAdd(userRoleDB *models_db.UserRole) error
+	UserRoleGet(userId, roleId uint) (*models_db.UserRole, error)
 	UserRoleDelete(userId, roleId uint)
 }
 
-type RoleRepository interface {
-	GetRoleByUserId(uint) ([]models_db.Role, error)
-	GetRoleByName(string) (*models_api.Role, error)
-	GetListRole() ([]models_api.Role, error)
-	CreateRole(*models_api.Role) error
-	DeleteRole(*models_api.Role) error
-	UpdateRole(*models_api.Role) error
+type ILoginRepository interface {
 }
 
-type NetworkElementRepository interface {
-	CreateNetworkElement(*models_api.NeData) error
-	DeleteNetworkElementByName(string, string) error
-	GetNetworkElementByName(string, string) (*models_api.NeData, error)
-	GetListNetworkElement() ([]models_api.NeData, error)
-	GetNetworkElementByUserName(string) ([]models_api.NeData, error)
-}
-
-type HistoryRepository interface {
-	SaveHistory(*models_api.History) error
-	GetHistoryById(uint64) (*models_api.History, error)
-	DeleteHistoryById(uint64) error
-	GetHistoryListByMode(string) ([]models_api.History, error)
-	GetRecordHistoryByCommand(string) (*models_api.History, error)
-	GetHistoryCommandByModeLimit(string, int) ([]models_api.History, error)
-	GetHistorySavingLog(neSiteName string) ([]models_api.History, error)
-}
-
-type LoginRepository interface {
-}
-
-type MmeCommandRepository interface {
+type IMmeCommandRepository interface {
 }

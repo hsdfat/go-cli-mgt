@@ -1,101 +1,113 @@
 package postgres
 
 import (
-	"context"
 	"errors"
 
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 
-	pgxv4 "github.com/jackc/pgx/v4"
+	"gorm.io/gorm"
 )
 
+// GetRoleByUserId retrieves all roles assigned to a user
 func (c *PgClient) GetRoleByUserId(userId uint) ([]models_db.Role, error) {
-	query := `SELECT r.id, r.role_name, r.description, r.priority FROM "role" r JOIN user_role ur ON r.id = ur.role_id JOIN "user" u ON ur.user_id = u.id WHERE u.id = $1`
-	rows, err := c.pool.Query(context.Background(), query, userId)
-	if err != nil {
-		return nil, err
+	var rolesDB []models_db.Role
+
+	// Use JOIN to get roles associated with the user
+	result := c.Db.
+		Table("role r").
+		Select("r.id, r.role_name, r.description").
+		Joins("JOIN user_role ur ON r.id = ur.role_id").
+		Where("ur.user_id = ?", userId).
+		Find(&rolesDB)
+
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to get roles for user ID %d: %v", userId, result.Error)
+		return nil, result.Error
 	}
-	defer rows.Close()
-	var roleList []models_db.Role
-	for rows.Next() {
-		var role models_db.Role
-		err = rows.Scan(&role.Id, &role.RoleName, &role.Description, &role.Priority)
-		if err != nil {
-			return nil, err
+
+	logger.Logger.Infof("Retrieved %d roles for user ID %d", len(rolesDB), userId)
+	return rolesDB, nil
+}
+
+// GetRoleByName retrieves a role by its name
+func (c *PgClient) GetRoleByName(roleName string) (*models_db.Role, error) {
+	var roleDB models_db.Role
+
+	result := c.Db.Where("role_name = ?", roleName).First(&roleDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("Role not found with name: %s", roleName)
+			return nil, errors.New("role not found")
 		}
-		roleList = append(roleList, role)
+		logger.Logger.Errorf("Failed to get role by name: %v", result.Error)
+		return nil, result.Error
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return roleList, nil
+	return &roleDB, nil
 }
 
-func (c *PgClient) GetRoleByName(roleName string) (*models_api.Role, error) {
-	q := `SELECT id, role_name, description, priority FROM "role" WHERE role_name = $1`
-	row := c.pool.QueryRow(context.Background(), q, roleName)
+// GetListRole retrieves all roles
+func (c *PgClient) GetListRole() ([]models_db.Role, error) {
+	var rolesDB []models_db.Role
 
-	var role models_api.Role
-	err := row.Scan(&role.RoleId, &role.RoleName, &role.Description, &role.Priority)
-	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, errors.New("role not found")
-	} else if err != nil {
-		return nil, err
+	result := c.Db.Find(&rolesDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to list roles: %v", result.Error)
+		return nil, result.Error
 	}
-	return &role, nil
+
+	logger.Logger.Infof("Retrieved %d roles", len(rolesDB))
+	return rolesDB, nil
 }
 
-func (c *PgClient) CreateRole(role *models_api.Role) error {
-	q := `INSERT INTO "role" (role_name, description, priority) VALUES ($1, $2, $3) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), q, role.RoleName, role.Description, role.Priority)
-	var id uint
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// CreateRole creates a new role in database
+func (c *PgClient) CreateRole(roleDB *models_db.Role) error {
+	// Create role using GORM
+	result := c.Db.Create(roleDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to create role: %v", result.Error)
+		return result.Error
 	}
-	role.RoleId = id
+
+	logger.Logger.Infof("Role created successfully with ID: %d", roleDB.ID)
 	return nil
 }
 
-func (c *PgClient) DeleteRole(role *models_api.Role) error {
-	q := `DELETE FROM "role" WHERE role_name = $1 AND priority = $2`
-	_ = c.pool.QueryRow(context.Background(), q, role.RoleName, role.Priority)
+// DeleteRole deletes a role from database
+func (c *PgClient) DeleteRole(roleDB *models_db.Role) error {
+	result := c.Db.Where("role_name = ?", roleDB.RoleName).Delete(&models_db.Role{})
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to delete role: %v", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No role found with name: %s", roleDB.RoleName)
+		return errors.New("role not found")
+	}
+
+	logger.Logger.Infof("Role deleted successfully: %s", roleDB.RoleName)
 	return nil
 }
 
-func (c *PgClient) UpdateRole(role *models_api.Role) error {
-	q := `UPDATE "role" SET role_name = $1, description = $2, priority = $3 WHERE id = $4 RETURNING id`
-	row := c.pool.QueryRow(context.Background(), q, role.RoleName, role.Description, role.Priority, role.RoleId)
-	var id uint
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// UpdateRole updates role information
+func (c *PgClient) UpdateRole(roleDB *models_db.Role) error {
+	updates := map[string]interface{}{
+		"description": roleDB.Description,
 	}
-	role.RoleId = id
-	return nil
-}
 
-func (c *PgClient) GetListRole() ([]models_api.Role, error) {
-	q := `SELECT id, role_name, description, priority FROM "role"`
-	rows, err := c.pool.Query(context.Background(), q)
-	if err != nil {
-		return nil, err
+	result := c.Db.Model(&models_db.Role{}).Where("role_name = ?", roleDB.RoleName).Updates(updates)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to update role: %v", result.Error)
+		return result.Error
 	}
-	defer rows.Close()
-	var roleList []models_api.Role
-	for rows.Next() {
-		var role models_api.Role
-		err = rows.Scan(&role.RoleId, &role.RoleName, &role.Description, &role.Priority)
-		if err != nil {
-			return nil, err
-		}
-		roleList = append(roleList, role)
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No role found with name: %s", roleDB.RoleName)
+		return errors.New("role not found")
 	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-	return roleList, nil
+
+	logger.Logger.Infof("Role updated successfully: %s", roleDB.RoleName)
+	return nil
 }

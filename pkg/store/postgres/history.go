@@ -1,130 +1,129 @@
 package postgres
 
 import (
-	"context"
 	"errors"
+	"time"
 
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 
-	"github.com/jackc/pgx/v4"
+	"gorm.io/gorm"
 )
 
-func (c *PgClient) SaveHistory(history *models_api.History) error {
-	query := `INSERT INTO "operation_history" (username, command, executed_time, user_ip, result, ne_name, mode) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, history.Username, history.Command, history.ExecutedTime, history.UserIp, history.Result, history.NeName, history.Mode)
-
-	var id uint64
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// SaveHistory saves operation history to database
+func (c *PgClient) SaveHistory(historyDB *models_db.OperationHistory) error {
+	// Create history record using GORM
+	result := c.Db.Create(historyDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to save history: %v", result.Error)
+		return result.Error
 	}
-	history.Id = id
+
+	logger.Logger.Infof("History saved successfully with ID: %d", historyDB.ID)
 	return nil
 }
 
-func (c *PgClient) GetHistoryById(id uint64) (*models_api.History, error) {
-	query := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE id = $1`
-	row := c.pool.QueryRow(context.Background(), query, id)
-	var history models_api.History
-	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, errors.New("history command not found")
-	} else if err != nil {
-		return nil, err
+// GetHistoryById retrieves a history record by ID
+func (c *PgClient) GetHistoryById(id uint64) (*models_db.OperationHistory, error) {
+	var historyDB models_db.OperationHistory
+
+	result := c.Db.Where("id = ?", id).First(&historyDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("History not found with ID: %d", id)
+			return nil, errors.New("history command not found")
+		}
+		logger.Logger.Errorf("Failed to get history by ID: %v", result.Error)
+		return nil, result.Error
 	}
 
-	return &history, nil
+	return &historyDB, nil
 }
 
+// DeleteHistoryById deletes a history record by ID
 func (c *PgClient) DeleteHistoryById(id uint64) error {
-	query := `DELETE FROM "operation_history" WHERE id = $1`
-	_ = c.pool.QueryRow(context.Background(), query, id)
+	result := c.Db.Where("id = ?", id).Delete(&models_db.OperationHistory{})
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to delete history: %v", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No history found with ID: %d", id)
+		return errors.New("history not found")
+	}
+
+	logger.Logger.Infof("History deleted successfully: ID %d", id)
 	return nil
 }
 
-func (c *PgClient) GetHistoryListByMode(mode string) ([]models_api.History, error) {
-	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE mode = $1`
-	rows, err := c.pool.Query(context.Background(), q, mode)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var histories []models_api.History
-	for rows.Next() {
-		var history models_api.History
-		err = rows.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
-		if err != nil {
-			return nil, err
-		}
-		histories = append(histories, history)
+// GetHistoryListByMode retrieves all history records filtered by mode
+func (c *PgClient) GetHistoryListByMode(mode string) ([]models_db.OperationHistory, error) {
+	var historiesDB []models_db.OperationHistory
+
+	result := c.Db.Where("mode = ?", mode).Find(&historiesDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to get history list by mode: %v", result.Error)
+		return nil, result.Error
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return histories, nil
+	logger.Logger.Infof("Retrieved %d history records for mode: %s", len(historiesDB), mode)
+	return historiesDB, nil
 }
 
-// GetRecordHistoryByCommand This function only use for test check if existed record in database
-func (c *PgClient) GetRecordHistoryByCommand(command string) (*models_api.History, error) {
-	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE command = $1`
-	row := c.pool.QueryRow(context.Background(), q, command)
-	var history models_api.History
-	err := row.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, errors.New("history command not found")
-	} else if err != nil {
-		return nil, err
+// GetRecordHistoryByCommand retrieves a history record by command (for testing)
+// This function only use for test check if existed record in database
+func (c *PgClient) GetRecordHistoryByCommand(command string) (*models_db.OperationHistory, error) {
+	var historyDB models_db.OperationHistory
+
+	result := c.Db.Where("command = ?", command).First(&historyDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("History not found with command: %s", command)
+			return nil, errors.New("history command not found")
+		}
+		logger.Logger.Errorf("Failed to get history by command: %v", result.Error)
+		return nil, result.Error
 	}
 
-	return &history, nil
+	return &historyDB, nil
 }
 
-func (c *PgClient) GetHistoryCommandByModeLimit(mode string, limit int) ([]models_api.History, error) {
-	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE mode = $1 ORDER BY id DESC LIMIT $2`
-	rows, err := c.pool.Query(context.Background(), q, mode, limit)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var histories []models_api.History
-	for rows.Next() {
-		var history models_api.History
-		err = rows.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
-		if err != nil {
-			return nil, err
-		}
-		histories = append(histories, history)
+// GetHistoryCommandByModeLimit retrieves history records filtered by mode with limit
+func (c *PgClient) GetHistoryCommandByModeLimit(mode string, limit int) ([]models_db.OperationHistory, error) {
+	var historiesDB []models_db.OperationHistory
+
+	result := c.Db.
+		Where("mode = ?", mode).
+		Order("id DESC").
+		Limit(limit).
+		Find(&historiesDB)
+
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to get history by mode with limit: %v", result.Error)
+		return nil, result.Error
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return histories, nil
+	logger.Logger.Infof("Retrieved %d history records for mode: %s (limit: %d)", len(historiesDB), mode, limit)
+	return historiesDB, nil
 }
 
-func (c *PgClient) GetHistorySavingLog(neSiteName string) ([]models_api.History, error) {
-	q := `SELECT id, username, command, executed_time, user_ip, result, ne_name, mode FROM "operation_history" WHERE ne_name = $1 AND executed_time >= NOW() - INTERVAL '1 day'`
-	rows, err := c.pool.Query(context.Background(), q, neSiteName)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var histories []models_api.History
-	for rows.Next() {
-		var history models_api.History
-		err = rows.Scan(&history.Id, &history.Username, &history.Command, &history.ExecutedTime, &history.UserIp, &history.Result, &history.NeName, &history.Mode)
-		if err != nil {
-			return nil, err
-		}
-		histories = append(histories, history)
+// GetHistorySavingLog retrieves history records for a specific network element from last 24 hours
+func (c *PgClient) GetHistorySavingLog(neSiteName string) ([]models_db.OperationHistory, error) {
+	var historiesDB []models_db.OperationHistory
+
+	// Calculate time 24 hours ago
+	oneDayAgo := time.Now().Add(-24 * time.Hour)
+
+	result := c.Db.
+		Where("ne_name = ? AND executed_time >= ?", neSiteName, oneDayAgo).
+		Find(&historiesDB)
+
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to get saving log history: %v", result.Error)
+		return nil, result.Error
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return histories, nil
+	logger.Logger.Infof("Retrieved %d saving log history records for NE: %s", len(historiesDB), neSiteName)
+	return historiesDB, nil
 }

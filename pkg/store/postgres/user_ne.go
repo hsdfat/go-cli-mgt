@@ -1,44 +1,54 @@
 package postgres
 
 import (
-	"context"
 	"errors"
 
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 
-	"github.com/jackc/pgx/v4"
+	"gorm.io/gorm"
 )
 
-func (c *PgClient) UserNeAdd(userNe *models_api.UserNe) error {
-	query := `INSERT INTO "user_ne" (user_id, ne_id) VALUES ($1, $2) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, userNe.UserId, userNe.NeId)
-
-	var id uint
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// UserNeAdd adds a user-network element relationship
+func (c *PgClient) UserNeAdd(userNeDB *models_db.UserNe) error {
+	// Create user_ne record using GORM
+	result := c.Db.Create(userNeDB)
+	if result.Error != nil {
+		return result.Error
 	}
-	userNe.Id = id
+
+	logger.Logger.Infof("User-NE relationship added successfully: UserID %d, NeID %d", userNeDB.UserID, userNeDB.NeID)
 	return nil
 }
 
+// UserNeDelete deletes a user-network element relationship
 func (c *PgClient) UserNeDelete(userId, neId uint) error {
-	query := `DELETE FROM "user_ne" WHERE user_id = $1 AND ne_id = $2`
-	_ = c.pool.QueryRow(context.Background(), query, userId, neId)
+	result := c.Db.Where("user_id = ? AND ne_id = ?", userId, neId).Delete(&models_db.UserNe{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("user-ne relationship not found")
+	}
+
+	logger.Logger.Infof("User-NE relationship deleted successfully: UserID %d, NeID %d", userId, neId)
 	return nil
 }
 
-func (c *PgClient) UserNeGet(userId, neId uint) (*models_api.UserNe, error) {
-	q := `SELECT id, user_id, ne_id FROM "user_ne" WHERE user_id = $1 AND ne_id = $2`
-	row := c.pool.QueryRow(context.Background(), q, userId, neId)
+// UserNeGet retrieves a user-network element relationship
+func (c *PgClient) UserNeGet(userId, neId uint) (*models_db.UserNe, error) {
+	var userNeDB models_db.UserNe
 
-	var userNe models_api.UserNe
-	err := row.Scan(&userNe.Id, &userNe.UserId, &userNe.NeId)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, errors.New("user do not have permission with ne")
-	} else if err != nil {
-		return nil, err
+	result := c.Db.Where("user_id = ? AND ne_id = ?", userId, neId).First(&userNeDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("User-NE relationship not found: UserID %d, NeID %d", userId, neId)
+			return nil, errors.New("user do not have permission with ne")
+		}
+		logger.Logger.Errorf("Failed to get user-ne relationship: %v", result.Error)
+		return nil, result.Error
 	}
 
-	return &userNe, nil
+	return &userNeDB, nil
 }

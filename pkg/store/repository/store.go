@@ -2,15 +2,14 @@ package repository
 
 import (
 	"github.com/hsdfat/go-cli-mgt/pkg/config"
-	"github.com/hsdfat/go-cli-mgt/pkg/store/mysql"
 	"github.com/hsdfat/go-cli-mgt/pkg/store/postgres"
 )
 
 var (
-	store DatabaseStore
+	store IDatabaseStore
 )
 
-func GetSingleton() DatabaseStore {
+func GetSingleton() IDatabaseStore {
 	return store
 }
 
@@ -19,7 +18,7 @@ func Init() {
 	cfg := config.GetDatabaseConfig()
 	switch cfg.DbType {
 	case "mysql":
-		store, err = mysql.NewClient(cfg)
+		// store, err = mysql.NewClient(cfg)
 	case "postgresql":
 		store, err = postgres.NewClient(cfg)
 	//case "aerospike":

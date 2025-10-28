@@ -1,95 +1,116 @@
 package postgres
 
 import (
-	"context"
 	"errors"
 
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 
-	pgxv4 "github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v5"
+	"gorm.io/gorm"
 )
 
-func (c *PgClient) CreateUser(user *models_api.User) error {
-	query := `INSERT INTO "user" (username, email, password, active, created_date_unix, disable_date_unix) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
-	row := c.pool.QueryRow(context.Background(), query, user.Username, user.Email, user.Password, user.Active, user.CreatedDate, user.DisableDate)
-
-	var id uint
-	err := row.Scan(&id)
-	if err != nil {
-		return err
+// CreateUser creates a new user in database
+func (c *PgClient) CreateUser(userDB *models_db.User) error {
+	// Create user using GORM
+	result := c.Db.Create(userDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to create user: %v", result.Error)
+		return result.Error
 	}
-	user.Id = id
+
+	logger.Logger.Infof("User created successfully with ID: %d", userDB.ID)
 	return nil
 }
 
+// DeleteUser deletes a user by username
 func (c *PgClient) DeleteUser(username string) error {
-	query := `DELETE FROM "user" WHERE username = $1`
-	_ = c.pool.QueryRow(context.Background(), query, username)
+	result := c.Db.Where("username = ?", username).Delete(&models_db.User{})
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to delete user: %v", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No user found with username: %s", username)
+		return errors.New("user not found")
+	}
+
+	logger.Logger.Infof("User deleted successfully: %s", username)
 	return nil
 }
 
-func (c *PgClient) UpdateUser(user *models_api.User) error {
-	query := `UPDATE "user" SET password = $1, active = $2, disable_date_unix = $3, deactivate_by = $4 where id = $5`
-	_ = c.pool.QueryRow(context.Background(), query, user.Password, user.Active, user.DisableDate, user.DeActivateBy, user.Id)
+// UpdateUser updates user information
+func (c *PgClient) UpdateUser(userUpdate *models_db.User) error {
+	result := c.Db.Model(&models_db.User{}).Where("id = ?", userUpdate.ID).Updates(userUpdate)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to update user: %v", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Logger.Warnf("No user found with ID: %d", userUpdate.ID)
+		return errors.New("user not found")
+	}
+
+	logger.Logger.Infof("User updated successfully: ID %d", userUpdate.ID)
 	return nil
 }
 
-func (c *PgClient) UpdatePasswordUser(user *models_api.User) {
-	q := `UPDATE "user" SET password = $1 WHERE id = $2`
-	_ = c.pool.QueryRow(context.Background(), q, user.Password, user.Id)
-}
-
-func (c *PgClient) GetUserByID(id uint) (*models_api.User, error) {
-	query := `SELECT id, username, email, password FROM "user" WHERE id = $1`
-	row := c.pool.QueryRow(context.Background(), query, id)
-
-	var user models_api.User
-	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Password)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, errors.New("user not found")
-	} else if err != nil {
-		return nil, err
+// UpdatePasswordUser updates only the password of a user
+func (c *PgClient) UpdatePasswordUser(userDB *models_db.User) {
+	result := c.Db.Model(&models_db.User{}).Where("id = ?", userDB.ID).Update("password", userDB.Password)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to update password for user ID %d: %v", userDB.ID, result.Error)
+		return
 	}
 
-	return &user, nil
+	logger.Logger.Infof("Password updated successfully for user ID: %d", userDB.ID)
 }
 
-func (c *PgClient) GetUserByUsername(username string) (*models_api.User, error) {
-	query := `SELECT "id", "username", "password", "active", "email", "created_date_unix", "disable_date_unix" FROM "user" WHERE username = $1`
-	row := c.pool.QueryRow(context.Background(), query, username)
+// GetUserByID retrieves a user by ID
+func (c *PgClient) GetUserByID(id uint) (*models_db.User, error) {
+	var userDB models_db.User
 
-	var user models_api.User
-	err := row.Scan(&user.Id, &user.Username, &user.Password, &user.Active, &user.Email, &user.CreatedDate, &user.DisableDate)
-	if errors.Is(err, pgxv4.ErrNoRows) {
-		return nil, errors.New("user not found")
-	} else if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-func (c *PgClient) ListUsers() ([]models_api.User, error) {
-	query := `SELECT id, username, email FROM "user"`
-	rows, err := c.pool.Query(context.Background(), query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var users []models_api.User
-	for rows.Next() {
-		var user models_api.User
-		err = rows.Scan(&user.Id, &user.Username, &user.Email)
-		if err != nil {
-			return nil, err
+	result := c.Db.Where("id = ?", id).First(&userDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("User not found with ID: %d", id)
+			return nil, errors.New("user not found")
 		}
-		users = append(users, user)
+		logger.Logger.Errorf("Failed to get user by ID: %v", result.Error)
+		return nil, result.Error
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
+	return &userDB, nil
+}
+
+// GetUserByUsername retrieves a user by username
+func (c *PgClient) GetUserByUsername(username string) (*models_db.User, error) {
+	var userDB models_db.User
+
+	result := c.Db.Where("username = ?", username).First(&userDB)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			logger.Logger.Warnf("User not found with username: %s", username)
+			return nil, errors.New("user not found")
+		}
+		logger.Logger.Errorf("Failed to get user by username: %v", result.Error)
+		return nil, result.Error
 	}
 
-	return users, nil
+	return &userDB, nil
+}
+
+// ListUsers retrieves all users
+func (c *PgClient) ListUsers() ([]models_db.User, error) {
+	var usersDB []models_db.User
+
+	result := c.Db.Find(&usersDB)
+	if result.Error != nil {
+		logger.Logger.Errorf("Failed to list users: %v", result.Error)
+		return nil, result.Error
+	}
+
+	logger.Logger.Infof("Retrieved %d users", len(usersDB))
+	return usersDB, nil
 }
