@@ -2,13 +2,46 @@ package svc
 
 import (
 	"github.com/hsdfat/go-cli-mgt/pkg/logger"
-	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 	"github.com/hsdfat/go-cli-mgt/pkg/store/repository"
 )
 
-func CreateRole(role *models_api.Role) error {
+type Role struct {
+	RoleId      uint
+	RoleName    string
+	Description string
+}
+
+type RoleService struct {
+	repo repository.IDatabaseStore
+}
+
+func NewRoleService() *RoleService {
+	return &RoleService{
+		repo: repository.GetSingleton(),
+	}
+}
+
+func (s *RoleService) toDb(roleSVC *Role) *models_db.Role {
+	return &models_db.Role{
+		ID:          roleSVC.RoleId,
+		RoleName:    roleSVC.RoleName,
+		Description: roleSVC.Description,
+	}
+}
+
+func (s *RoleService) fromDb(roleDB *models_db.Role) *Role {
+	return &Role{
+		RoleId:      roleDB.ID,
+		RoleName:    roleDB.RoleName,
+		Description: roleDB.Description,
+	}
+}
+
+func (s *RoleService) CreateRole(role *Role) error {
 	logger.Logger.Info("Create role: ", role.RoleName)
-	err := repository.GetSingleton().CreateRole(role)
+	roleDb := s.toDb(role)
+	err := s.repo.CreateRole(roleDb)
 	if err != nil {
 		logger.Logger.Error("Cannot create role, err: ", err)
 		return err
@@ -17,9 +50,10 @@ func CreateRole(role *models_api.Role) error {
 	return nil
 }
 
-func DeleteRole(role *models_api.Role) error {
+func (s *RoleService) DeleteRole(role *Role) error {
 	logger.Logger.Info("Delete role: ", role.RoleName)
-	err := repository.GetSingleton().DeleteRole(role)
+	roleDb := s.toDb(role)
+	err := s.repo.DeleteRole(roleDb)
 	if err != nil {
 		logger.Logger.Error("Cannot delete role, err: ", err)
 		return err
@@ -28,31 +62,40 @@ func DeleteRole(role *models_api.Role) error {
 	return nil
 }
 
-func GetRoleByName(roleName string) (*models_api.Role, error) {
+func (s *RoleService) GetRoleByName(roleName string) (*Role, error) {
 	logger.Logger.Info("Get role from database with role name ", roleName)
-	role, err := repository.GetSingleton().GetRoleByName(roleName)
+	roleDb, err := s.repo.GetRoleByName(roleName)
 	if err != nil {
 		logger.Logger.Error("Cannot get role by role name from database, err: ", err)
 		return nil, err
 	}
 	logger.Logger.Info("Get role success from database with role name ", roleName)
-	return role, nil
+	return s.fromDb(roleDb), nil
 }
 
-func GetListRole() ([]models_api.Role, error) {
-	roleList, err := repository.GetSingleton().GetListRole()
+func (s *RoleService) GetListRole() ([]*Role, error) {
+	rolesDb, err := s.repo.GetListRole()
 	if err != nil {
 		logger.Logger.Error("Cannot get role list, err: ", err)
 		return nil, err
 	}
-	return roleList, nil
+
+	var rolesSVC []*Role
+	for _, roleDb := range rolesDb {
+		rolesSVC = append(rolesSVC, s.fromDb(&roleDb))
+	}
+
+	return rolesSVC, nil
 }
 
-func UpdateRole(role *models_api.Role) {
+func (s *RoleService) UpdateRole(role *Role) error {
 	logger.Logger.Info("Update role from database with role name ", role.RoleName)
 	logger.Logger.Debug("Description: ", role.Description)
-	err := repository.GetSingleton().UpdateRole(role)
+	roleDb := s.toDb(role)
+	err := s.repo.UpdateRole(roleDb)
 	if err != nil {
 		logger.Logger.Error("Cannot update role, err: ", err)
+		return err
 	}
+	return nil
 }

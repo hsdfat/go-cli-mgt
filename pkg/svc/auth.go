@@ -8,8 +8,21 @@ import (
 	"github.com/hsdfat/go-cli-mgt/pkg/utils/bcrypt"
 )
 
-func Login(username, password string) (bool, error, uint) {
-	user, err := repository.GetSingleton().GetUserByUsername(username)
+// Auth không cần model riêng vì không có struct phức tạp
+
+// ===== SERVICE =====
+type AuthService struct {
+	repo repository.IDatabaseStore
+}
+
+func NewAuthService() *AuthService {
+	return &AuthService{
+		repo: repository.GetSingleton(),
+	}
+}
+
+func (s *AuthService) Login(username, password string) (bool, error, uint) {
+	user, err := s.repo.GetUserByUsername(username)
 	if err != nil {
 		logger.Logger.Error("Cannot get user by username from db, username: ", username)
 		return false, err, 0
@@ -25,11 +38,11 @@ func Login(username, password string) (bool, error, uint) {
 		return false, nil, 0
 	}
 
-	return true, nil, user.Id
+	return true, nil, user.ID
 }
 
-func GetRole(userId uint) (string, error) {
-	roleList, err := repository.GetSingleton().GetRoleByUserId(userId)
+func (s *AuthService) GetRole(userId uint) (string, error) {
+	roleList, err := s.repo.GetRoleByUserId(userId)
 	if err != nil {
 		logger.Logger.Error("Cannot get role by user id: ", err)
 		return "", err
