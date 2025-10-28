@@ -1,8 +1,8 @@
 package cronjob
 
 import (
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 	"github.com/robfig/cron/v3"
-	"go-cli-mgt/pkg/logger"
 )
 
 func initCronManager() {

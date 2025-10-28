@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-cli-mgt/pkg/cronjob"
-	"go-cli-mgt/pkg/server"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/cronjob"
+	"github.com/hsdfat/go-cli-mgt/pkg/server"
 )
 
 func main() {

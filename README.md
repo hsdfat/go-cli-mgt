@@ -1,4 +1,4 @@
-# go-cli-mgt
+# github.com/hsdfat/go-cli-mgt
 
 ## go-echo framework
 

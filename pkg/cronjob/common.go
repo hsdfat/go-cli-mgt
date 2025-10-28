@@ -1,7 +1,7 @@
 package cronjob
 
 import (
-	"go-cli-mgt/pkg/svc"
+	"github.com/hsdfat/go-cli-mgt/pkg/svc"
 
 	"github.com/robfig/cron/v3"
 )

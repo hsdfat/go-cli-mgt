@@ -2,11 +2,12 @@ package server
 
 import (
 	"fmt"
-	"go-cli-mgt/pkg/config"
-	"go-cli-mgt/pkg/logger"
-	models_config "go-cli-mgt/pkg/models/config"
-	"go-cli-mgt/pkg/store/repository"
 	"os"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_config "github.com/hsdfat/go-cli-mgt/pkg/models/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/repository"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"

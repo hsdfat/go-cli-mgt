@@ -2,9 +2,10 @@ package svc
 
 import (
 	"errors"
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/store/repository"
-	"go-cli-mgt/pkg/utils/bcrypt"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/repository"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/bcrypt"
 )
 
 func Login(username, password string) (bool, error, uint) {

@@ -2,7 +2,8 @@ package bcrypt
 
 import (
 	"errors"
-	"go-cli-mgt/pkg/logger"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"go-cli-mgt/pkg/logger"
-	models_config "go-cli-mgt/pkg/models/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_config "github.com/hsdfat/go-cli-mgt/pkg/models/config"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

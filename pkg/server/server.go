@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"go-cli-mgt/pkg/config"
-	"go-cli-mgt/pkg/logger"
+	"github.com/hsdfat/go-cli-mgt/pkg/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 )
 
 func ListenAndServe(app *fiber.App) {

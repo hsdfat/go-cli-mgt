@@ -1,10 +1,10 @@
 package role
 
 import (
-	"go-cli-mgt/pkg/logger"
-	models_api "go-cli-mgt/pkg/models/api"
-	"go-cli-mgt/pkg/svc"
-	"go-cli-mgt/pkg/utils/response"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/svc"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/response"
 
 	"github.com/gofiber/fiber/v2"
 )

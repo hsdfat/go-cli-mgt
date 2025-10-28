@@ -4,14 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"go-cli-mgt/pkg/logger"
-	models_api "go-cli-mgt/pkg/models/api"
-	"go-cli-mgt/pkg/store/repository"
-	"go-cli-mgt/pkg/utils/env"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/repository"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/env"
 )
 
 func DeleteHistoryById(id uint64) error {

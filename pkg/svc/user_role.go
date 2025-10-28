@@ -1,9 +1,9 @@
 package svc
 
 import (
-	"go-cli-mgt/pkg/logger"
-	models_api "go-cli-mgt/pkg/models/api"
-	"go-cli-mgt/pkg/store/repository"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/repository"
 )
 
 func RoleUserAdd(userId, roleId uint) error {

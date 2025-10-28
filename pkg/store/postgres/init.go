@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"go-cli-mgt/pkg/logger"
-	models_config "go-cli-mgt/pkg/models/config"
 	"os"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	models_config "github.com/hsdfat/go-cli-mgt/pkg/models/config"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )

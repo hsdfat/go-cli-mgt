@@ -2,10 +2,11 @@ package server
 
 import (
 	"bufio"
-	"go-cli-mgt/pkg/config"
-	"go-cli-mgt/pkg/logger"
 	"net"
 	"os"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 )
 
 func StartTCPServer() {

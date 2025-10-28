@@ -1,9 +1,9 @@
 package user
 
 import (
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/svc"
-	"go-cli-mgt/pkg/utils/response"
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	"github.com/hsdfat/go-cli-mgt/pkg/svc"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/response"
 
 	"github.com/gofiber/fiber/v2"
 )

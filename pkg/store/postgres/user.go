@@ -3,7 +3,8 @@ package postgres
 import (
 	"context"
 	"errors"
-	models_api "go-cli-mgt/pkg/models/api"
+
+	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
 
 	pgxv4 "github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v5"

@@ -1,9 +1,10 @@
 package response
 
 import (
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/models/response"
 	"net/http"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	"github.com/hsdfat/go-cli-mgt/pkg/models/response"
 
 	"github.com/gofiber/fiber/v2"
 )

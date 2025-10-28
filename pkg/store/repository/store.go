@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"go-cli-mgt/pkg/config"
-	"go-cli-mgt/pkg/store/mysql"
-	"go-cli-mgt/pkg/store/postgres"
+	"github.com/hsdfat/go-cli-mgt/pkg/config"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/mysql"
+	"github.com/hsdfat/go-cli-mgt/pkg/store/postgres"
 )
 
 var (

@@ -1,6 +1,6 @@
 package config
 
-import models_config "go-cli-mgt/pkg/models/config"
+import models_config "github.com/hsdfat/go-cli-mgt/pkg/models/config"
 
 var config *models_config.Config
 

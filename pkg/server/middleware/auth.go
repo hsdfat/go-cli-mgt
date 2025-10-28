@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"errors"
-	"go-cli-mgt/pkg/logger"
-	"go-cli-mgt/pkg/utils/response"
-	"go-cli-mgt/pkg/utils/token"
 	"strings"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/response"
+	"github.com/hsdfat/go-cli-mgt/pkg/utils/token"
 
 	"github.com/gofiber/fiber/v2"
 )

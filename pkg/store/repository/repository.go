@@ -1,8 +1,8 @@
 package repository
 
 import (
-	models_api "go-cli-mgt/pkg/models/api"
-	models_db "go-cli-mgt/pkg/models/db"
+	models_api "github.com/hsdfat/go-cli-mgt/pkg/models/api"
+	models_db "github.com/hsdfat/go-cli-mgt/pkg/models/db"
 )
 
 type DatabaseStore interface {

@@ -1,12 +1,12 @@
 package server
 
 import (
-	"go-cli-mgt/pkg/server/handler/auth"
-	"go-cli-mgt/pkg/server/handler/history"
-	"go-cli-mgt/pkg/server/handler/network_element"
-	"go-cli-mgt/pkg/server/handler/role"
-	"go-cli-mgt/pkg/server/handler/user"
-	"go-cli-mgt/pkg/server/middleware"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/handler/auth"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/handler/history"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/handler/network_element"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/handler/role"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/handler/user"
+	"github.com/hsdfat/go-cli-mgt/pkg/server/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )

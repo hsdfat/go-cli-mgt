@@ -2,9 +2,10 @@ package token
 
 import (
 	"errors"
-	"go-cli-mgt/pkg/logger"
 	"strings"
 	"time"
+
+	"github.com/hsdfat/go-cli-mgt/pkg/logger"
 
 	"github.com/golang-jwt/jwt/v5"
 )
