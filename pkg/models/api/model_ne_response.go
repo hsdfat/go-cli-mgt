@@ -9,10 +9,9 @@
 package models_api
 
 type NeResponse struct {
-
 	Code string `json:"code,omitempty"`
 
 	Message string `json:"message,omitempty"`
 
-	NeList []NeData `json:"ne-list,omitempty"`
+	// NeList []NeData `json:"ne-list,omitempty"`
 }

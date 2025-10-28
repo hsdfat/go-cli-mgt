@@ -2,7 +2,6 @@ package cronjob
 
 import (
 	"github.com/hsdfat/go-cli-mgt/pkg/svc"
-
 	"github.com/robfig/cron/v3"
 )
 
@@ -57,7 +56,7 @@ var (
 		Identifier:    "SLH",
 		Name:          "Cronjob Saving Log history everyday",
 		TimeScheduler: mapStringToTimeScheduler[EveryDay],
-		HandlerFunc:   svc.SavingLogHistory,
+		HandlerFunc:   svc.NewHistoryService().SavingLogHistory,
 	}
 
 	testCronjob = &CronInfo{

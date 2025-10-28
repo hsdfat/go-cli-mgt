@@ -36,3 +36,20 @@ type DatabaseConfig struct {
 type TokenConfig struct{}
 
 var DatabaseConfigInit Config
+
+type PostgresConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	DbName   string
+	Schema   string
+}
+
+type MySqlConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+}
